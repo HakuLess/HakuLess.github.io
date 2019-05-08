@@ -1,96 +1,108 @@
+
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-<meta name="description" content="" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+<meta charset="utf-8" >
+
 <title>BiliBili Android第三方——第0步 | HaKuLess</title>
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557324967676">
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557325084353">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
 
 
   </head>
   <body>
-    <div class="main">
-      <div class="main-content">
-        <div class="site-header">
-  <a href="https://hakuless.github.io/">
-  <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557324967676" alt="">
-  </a>
-  <h1 class="site-title">
-    HaKuLess
-  </h1>
-  <p class="site-description">
-    温故而知新
-  </p>
-  <div class="menu-container">
-    
-      
-        <a href="/" class="menu">
-          首页
-        </a>
-      
-    
-      
-        <a href="/archives" class="menu">
-          归档
-        </a>
-      
-    
-      
-        <a href="/tags" class="menu">
-          标签
-        </a>
-      
-    
-      
-        <a href="/post/about" class="menu">
-          关于
-        </a>
-      
-    
-  </div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://hakuless.github.io/">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557325084353" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://hakuless.github.io/">
+        <h1 class="site-title">HaKuLess</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
   </div>
 </div>
 
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
       
+        
+          <a href="/" class="menu purple-link">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="menu purple-link">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
         <div class="post-detail">
-          <article class="post">
-            <h2 class="post-title">
-              BiliBili Android第三方——第0步
-            </h2>
-            <div class="post-info">
-              <time class="post-time">
-                · 2016-01-21 ·
-              </time>
-              
-                <a href="https://hakuless.github.io//tag/tech" class="post-tags">
-                  # Tech
-                </a>
-              
-                <a href="https://hakuless.github.io//tag/android" class="post-tags">
-                  # Android
-                </a>
-              
-            </div>
+          
+          <h2 class="post-title">BiliBili Android第三方——第0步</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2016-01-21</span>
             
-            <div class="post-content">
-              <p>该项目的原因稍后再写，想开发BiliBili的Android第三方客户端总会有几个必须要跨过的坎，我们第0步主要就是为了这些而做的准备。</p>
+              <span>
+                <i class="icon-pricetags-outline"></i>
+                
+                  <a href="https://hakuless.github.io//tag/tech">
+                    Tech
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/android">
+                    Android
+                    
+                  </a>
+                
+              </span>
+            
+          </div>
+          <div class="post-content">
+            <p>该项目的原因稍后再写，想开发BiliBili的Android第三方客户端总会有几个必须要跨过的坎，我们第0步主要就是为了这些而做的准备。</p>
 <!--more-->
 <h3 id="后台服务">后台服务</h3>
 <p>已经很少有App能过脱离后台服务而独立运行，即便一些单机游戏也需要通过网络加载新的游戏关卡等，而我们做第三方App也同样需要后台服务的支持（除非只是想模拟UI，而非真实的功能）。</p>
@@ -170,23 +182,53 @@
 <hr>
 <p>Android开发新手，若有错误请指出，谢谢~</p>
 
-            </div>
-          </article>
+          </div>
         </div>
-    
-        
 
         
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">温故而知新</div>
+  <div class="social-container">
     
-        <div class="site-footer">
+      
+        <a href="https://github.com/HakuLess" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
   Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
 </div>
 
-<script>
-  hljs.initHighlightingOnLoad()
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
 </script>
 
-      </div>
-    </div>
+
+
+
   </body>
 </html>
