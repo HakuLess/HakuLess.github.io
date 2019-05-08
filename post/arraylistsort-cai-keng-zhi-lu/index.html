@@ -1,18 +1,15 @@
-
 <!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
+    <meta charset="utf-8" >
 
 <title>ArrayList.sort踩坑之旅 | HaKuLess</title>
 <meta name="description" content="温故而知新">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557325084353">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557325276933">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
@@ -20,89 +17,89 @@
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
 
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
 
 
   </head>
   <body>
     <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://hakuless.github.io/">
-        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557325084353" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://hakuless.github.io/">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://hakuless.github.io/">
+        <img src="https://hakuless.github.io//images/avatar.png?v=1557325276933" class="site-logo">
         <h1 class="site-title">HaKuLess</h1>
       </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
     </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
-    </div>
-  </div>
-</div>
-
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
+    <div>
       
         
-          <a href="/" class="menu purple-link">
+          <a href="/" class="site-nav">
             首页
           </a>
         
       
         
-          <a href="/archives" class="menu purple-link">
+          <a href="/archives" class="site-nav">
             归档
           </a>
         
       
         
-          <a href="/tags" class="menu purple-link">
+          <a href="/tags" class="site-nav">
             标签
           </a>
         
       
         
-          <a href="/post/about" class="menu purple-link">
+          <a href="/post/about" class="site-nav">
             关于
           </a>
         
       
     </div>
   </div>
-</transition>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+          <a class="social-link" href="https://github.com/HakuLess" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      温故而知新
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+  </div>
+</div>
 
 
-      <div class="content-container">
-        <div class="post-detail">
-          
-          <h2 class="post-title">ArrayList.sort踩坑之旅</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2018-04-09</span>
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">ArrayList.sort踩坑之旅</h2>
+            <div class="post-date">2018-04-09</div>
             
-              <span>
-                <i class="icon-pricetags-outline"></i>
-                
-                  <a href="https://hakuless.github.io//tag/tech">
-                    Tech
-                    
-                      ，
-                    
-                  </a>
-                
-                  <a href="https://hakuless.github.io//tag/android">
-                    Android
-                    
-                  </a>
-                
-              </span>
-            
-          </div>
-          <div class="post-content">
-            <h2 id="背景">背景</h2>
+            <div class="post-content">
+              <h2 id="背景">背景</h2>
 <p>相信大家经常会用到各种优惠券，如外卖、打车等场景，而其中优惠券的排序，需要按照多个维度来排序，比如：</p>
 <ol>
 <li>首先按照价格是否满足可用，所有可用的在最前面，不可用的在最后面</li>
@@ -265,47 +262,44 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 <p><a href="http://blog.2baxb.me/archives/993">图解JDK7的Comparison method violates its general contract异常</a>
 <a href="https://blog.csdn.net/shadow_zed/article/details/72758912">crash数据</a></p>
 
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://hakuless.github.io//tag/tech" class="tag">
+                    Tech
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/android" class="tag">
+                    Android
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">
+                  <h3 class="post-title">
+                    2017年终总结
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
           </div>
+
         </div>
-
-        
-          <div class="next-post">
-            <a class="purple-link" href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">
-              <h3 class="post-title">
-                下一篇：2017年终总结
-              </h3>
-            </a>
-          </div>
-          
       </div>
-
-      
-
-      <div class="site-footer">
-  <div class="slogan">温故而知新</div>
-  <div class="social-container">
-    
-      
-        <a href="https://github.com/HakuLess" target="_blank">
-          <i class="fab fa-github"></i>
-        </a>
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
-</div>
-
-
     </div>
-    <script type="application/javascript">
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
 
 hljs.initHighlightingOnLoad()
 
