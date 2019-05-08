@@ -1,102 +1,93 @@
-<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" >
-
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Freeline打包流程初探 | HaKuLess</title>
-<meta name="description" content="温故而知新">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557324967676">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557324814604">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
 
 
   </head>
   <body>
-    <div id="app" class="main">
-
-      <div class="sidebar" :class="{ 'full-height': menuVisible }">
-  <div class="top-container" data-aos="fade-right">
-    <div class="top-header-container">
-      <a class="site-title-container" href="https://hakuless.github.io/">
-        <img src="https://hakuless.github.io//images/avatar.png?v=1557324814604" class="site-logo">
-        <h1 class="site-title">HaKuLess</h1>
-      </a>
-      <div class="menu-btn" @click="menuVisible = !menuVisible">
-        <div class="line"></div>
-      </div>
-    </div>
-    <div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://hakuless.github.io/">
+  <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557324967676" alt="">
+  </a>
+  <h1 class="site-title">
+    HaKuLess
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
       
-        
-          <a href="/" class="site-nav">
-            首页
-          </a>
-        
+        <a href="/" class="menu">
+          首页
+        </a>
       
-        
-          <a href="/archives" class="site-nav">
-            归档
-          </a>
-        
+    
       
-        
-          <a href="/tags" class="site-nav">
-            标签
-          </a>
-        
+        <a href="/archives" class="menu">
+          归档
+        </a>
       
-        
-          <a href="/post/about" class="site-nav">
-            关于
-          </a>
-        
+    
       
-    </div>
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
   </div>
-  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
-    <div class="social-container">
+  <div class="social-container">
+    
       
-        
-          <a class="social-link" href="https://github.com/HakuLess" target="_blank">
-            <i class="fab fa-github"></i>
-          </a>
-        
+    
       
-        
+    
       
-        
+    
       
-        
+    
       
-        
-      
-    </div>
-    <div class="site-description">
-      温故而知新
-    </div>
-    <div class="site-footer">
-      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
-    </div>
+    
   </div>
 </div>
 
-
-      <div class="main-container">
-        <div class="content-container" data-aos="fade-up">
-          <div class="post-detail">
-            <h2 class="post-title">Freeline打包流程初探</h2>
-            <div class="post-date">2017-05-11</div>
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Freeline打包流程初探
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2017-05-11 ·
+              </time>
+              
+                <a href="https://hakuless.github.io//tag/tech" class="post-tags">
+                  # Tech
+                </a>
+              
+                <a href="https://hakuless.github.io//tag/android" class="post-tags">
+                  # Android
+                </a>
+              
+            </div>
             
             <div class="post-content">
               <p>点评、美团的Android App两者在业内都是巨量级的大小，对于开发来说编译耗时过长十分影响开发效率，在表层所能做的工作比较有限（module转为aar），节省仍有瓶颈。然而在使用Freeline的增量编译后，已经爱不释手，对开发效率有极大的提升，因此深入了解下其详细实现并对大家分享（安利）一下~</p>
@@ -465,57 +456,31 @@ DexCommand  如果有java文件改变则会执行run_dex_task方法，执行的d
 <p><a href="http://blog.ayong.me/2016/10/26/Freeline%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0Gradle%E5%B7%A5%E7%A8%8B%E4%B8%8A%E7%9A%84%E5%A2%9E%E9%87%8F%E7%BC%96%E8%AF%91/#more">Freeline：如何实现 Gradle 工程上的增量编译？</a></p>
 
             </div>
-            
-              <div class="tag-container">
-                
-                  <a href="https://hakuless.github.io//tag/tech" class="tag">
-                    Tech
-                  </a>
-                
-                  <a href="https://hakuless.github.io//tag/android" class="tag">
-                    Android
-                  </a>
-                
-              </div>
-            
-            
-              <div class="next-post">
-                <div class="next">下一篇</div>
-                <a href="https://hakuless.github.io//post/android-leng-men-kai-fa-zhi-widget-kai-fa">
-                  <h3 class="post-title">
-                    Android冷门开发之 Widget 开发
-                  </h3>
-                </a>
-              </div>
-            
-
-            
-
-          </div>
-
+          </article>
         </div>
-      </div>
-    </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://hakuless.github.io//post/android-leng-men-kai-fa-zhi-widget-kai-fa">
+              <h3 class="post-title">
+                Android冷门开发之 Widget 开发
+              </h3>
+            </a>
+          </div>  
+        
 
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
 
-<script type="application/javascript">
-
-AOS.init();
-
-hljs.initHighlightingOnLoad()
-
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
-
+<script>
+  hljs.initHighlightingOnLoad()
 </script>
 
-
-
-
+      </div>
+    </div>
   </body>
 </html>

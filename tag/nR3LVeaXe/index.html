@@ -1,177 +1,166 @@
-<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" >
-
+  <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Life | HaKuLess</title>
-<meta name="description" content="温故而知新">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557324967676">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557324814604">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
 
 
   </head>
   <body>
-    <div id="app" class="main">
-
-      <div class="sidebar" :class="{ 'full-height': menuVisible }">
-  <div class="top-container" data-aos="fade-right">
-    <div class="top-header-container">
-      <a class="site-title-container" href="https://hakuless.github.io/">
-        <img src="https://hakuless.github.io//images/avatar.png?v=1557324814604" class="site-logo">
-        <h1 class="site-title">HaKuLess</h1>
-      </a>
-      <div class="menu-btn" @click="menuVisible = !menuVisible">
-        <div class="line"></div>
-      </div>
-    </div>
-    <div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://hakuless.github.io/">
+  <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557324967676" alt="">
+  </a>
+  <h1 class="site-title">
+    HaKuLess
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
       
-        
-          <a href="/" class="site-nav">
-            首页
-          </a>
-        
+        <a href="/" class="menu">
+          首页
+        </a>
       
-        
-          <a href="/archives" class="site-nav">
-            归档
-          </a>
-        
+    
       
-        
-          <a href="/tags" class="site-nav">
-            标签
-          </a>
-        
+        <a href="/archives" class="menu">
+          归档
+        </a>
       
-        
-          <a href="/post/about" class="site-nav">
-            关于
-          </a>
-        
+    
       
-    </div>
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
   </div>
-  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
-    <div class="social-container">
+  <div class="social-container">
+    
       
-        
-          <a class="social-link" href="https://github.com/HakuLess" target="_blank">
-            <i class="fab fa-github"></i>
-          </a>
-        
+    
       
-        
+    
       
-        
+    
       
-        
+    
       
-        
-      
-    </div>
-    <div class="site-description">
-      温故而知新
-    </div>
-    <div class="site-footer">
-      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
-    </div>
+    
   </div>
 </div>
 
-
-      <div class="main-container">
-        <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: Life</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">
-                  <h2 class="post-title">2017年终总结</h2>
-                </a>
-                <div class="post-date">
-                  2018-02-13
-                </div>
-                <div class="post-abstract">
-                  <p>2017算是毕业之后过的最Happy的一年了，没有别的原因，就是终于有点小钱了..</p>
-
-                </div>
-              </div>
-              
-            </article>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://hakuless.github.io//post/dong-man-tui-jian-lesslessjun-noming-ha-greatergreater">
-                  <h2 class="post-title">动漫推荐 《君の名は。》</h2>
-                </a>
-                <div class="post-date">
-                  2016-12-13
-                </div>
-                <div class="post-abstract">
-                  <p>《你的名字。》（汉译）终于在大陆上映了，之前忍了好几个月不在D站上看盗版是值得的！原本打算去上海长风公园旁边的华谊兄弟看的，没想到B站做活动，vip3以上可以抢（领）免费的电影票（虽然只能万达），很轻松的拿到了票~ O(∩_∩)O~~</p>
-
-                </div>
-              </div>
-              
-            </article>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu">
-                  <h2 class="post-title">BiliBili Android第三方——第2步</h2>
-                </a>
-                <div class="post-date">
-                  2016-03-23
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
-
-          <div class="pagination-container">
-  
-  
-</div>
-
+        <div class="current-tag-container">
+            <h2 class="title">
+                标签：#Life
+            </h2> 
         </div>
+        <div class="post-container">
+  
+    <article class="post">
+      <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">
+        <h2 class="post-title">2017年终总结</h2>
+      </a>
+      <div class="post-info">
+        <time class="post-time">
+          · 2018-02-13 ·
+        </time>
+        
+          <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="post-tag">
+            # Life
+          </a>
+        
       </div>
-    </div>
+      
+      <div class="post-abstract">
+        <p>2017算是毕业之后过的最Happy的一年了，没有别的原因，就是终于有点小钱了..</p>
 
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+      </di>
+    </article>
+  
+    <article class="post">
+      <a href="https://hakuless.github.io//post/dong-man-tui-jian-lesslessjun-noming-ha-greatergreater">
+        <h2 class="post-title">动漫推荐 《君の名は。》</h2>
+      </a>
+      <div class="post-info">
+        <time class="post-time">
+          · 2016-12-13 ·
+        </time>
+        
+          <a href="https://hakuless.github.io//tag/6MiN8T9uX" class="post-tag">
+            # Anima
+          </a>
+        
+          <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="post-tag">
+            # Life
+          </a>
+        
+      </div>
+      
+      <div class="post-abstract">
+        <p>《你的名字。》（汉译）终于在大陆上映了，之前忍了好几个月不在D站上看盗版是值得的！原本打算去上海长风公园旁边的华谊兄弟看的，没想到B站做活动，vip3以上可以抢（领）免费的电影票（虽然只能万达），很轻松的拿到了票~ O(∩_∩)O~~</p>
 
-<script type="application/javascript">
+      </di>
+    </article>
+  
+    <article class="post">
+      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu">
+        <h2 class="post-title">BiliBili Android第三方——第2步</h2>
+      </a>
+      <div class="post-info">
+        <time class="post-time">
+          · 2016-03-23 ·
+        </time>
+        
+          <a href="https://hakuless.github.io//tag/tech" class="post-tag">
+            # Tech
+          </a>
+        
+          <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="post-tag">
+            # Life
+          </a>
+        
+      </div>
+      
+      <div class="post-abstract">
+        
+      </di>
+    </article>
+  
+</div>
 
-AOS.init();
+        <div class="pagination-container">
+  
+  
+</div>
 
-hljs.initHighlightingOnLoad()
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
-
+<script>
+  hljs.initHighlightingOnLoad()
 </script>
 
-
-
-
+      </div>
+    </div>
   </body>
 </html>
