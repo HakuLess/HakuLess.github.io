@@ -7,92 +7,96 @@
 <meta name="description" content="温故而知新">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557324755570">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557324814604">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
-<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
 
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
 
+
   </head>
   <body>
-  
-    <nav class="navbar border fixed split-nav">
-  <div class="nav-brand">
-    <h3><a href="https://hakuless.github.io/">HaKuLess</a></h3>
-  </div>
-  <div class="collapsible">
-    <input id="collapsible1" type="checkbox" name="collapsible1">
-    <button>
-      <label for="collapsible1">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-      </label>
-    </button>
-    <div class="collapsible-body">
-      <ul class="inline">
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://hakuless.github.io/">
+        <img src="https://hakuless.github.io//images/avatar.png?v=1557324814604" class="site-logo">
+        <h1 class="site-title">HaKuLess</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
         
-          <li>
-            
-              <a href="/" class="menu">
-                首页
-              </a>
-            
-          </li>
+          <a href="/" class="site-nav">
+            首页
+          </a>
         
-          <li>
-            
-              <a href="/archives" class="menu">
-                归档
-              </a>
-            
-          </li>
+      
         
-          <li>
-            
-              <a href="/tags" class="menu">
-                标签
-              </a>
-            
-          </li>
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
         
-          <li>
-            
-              <a href="/post/about" class="menu">
-                关于
-              </a>
-            
-          </li>
+      
         
-      </ul>
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
     </div>
   </div>
-</nav>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+          <a class="social-link" href="https://github.com/HakuLess" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      温故而知新
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+  </div>
+</div>
 
-    <div id="top" class="row site">
-      <div class="sm-12 md-8 col">
-        <div class="paper">
-          <article class="article">
-            <h1>ArrayList.sort踩坑之旅</h1>
-            <p class="article-meta">
-              2018-04-09
-              
-                <a href="https://hakuless.github.io//tag/tech" class="badge secondary">
-                  Tech
-                </a>
-              
-                <a href="https://hakuless.github.io//tag/android" class="badge ">
-                  Android
-                </a>
-              
-            </p>
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">ArrayList.sort踩坑之旅</h2>
+            <div class="post-date">2018-04-09</div>
             
             <div class="post-content">
               <h2 id="背景">背景</h2>
@@ -259,147 +263,36 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 <a href="https://blog.csdn.net/shadow_zed/article/details/72758912">crash数据</a></p>
 
             </div>
-          </article>
-        </div>
-        <div class="paper" data-aos="fade-in">
-          
-            <div class="next-post">
-              <div class="next">
-                下一篇
+            
+              <div class="tag-container">
+                
+                  <a href="https://hakuless.github.io//tag/tech" class="tag">
+                    Tech
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/android" class="tag">
+                    Android
+                  </a>
+                
               </div>
-              <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">
-                <h3 class="post-title">
-                  2017年终总结
-                </h3>
-              </a>
-            </div>
-          
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">
+                  <h3 class="post-title">
+                    2017年终总结
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
         </div>
-        
       </div>
-
-      <div class="sm-12 md-4 col sidebar">
-  <div class="paper info-container">
-    <img src="https://hakuless.github.io//images/avatar.png?v=1557324755570" class="no-responsive avatar">
-    <div class="text-muted">温故而知新</div>
-    <div class="social-container">
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    </div>
-  </div>
-  <div class="paper">
-    <div class="sidebar-title">
-      最新文章
-    </div>
-    <div class="row">
-      <ul>
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/arraylistsort-cai-keng-zhi-lu">ArrayList.sort踩坑之旅</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">2017年终总结</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie">Android Camera踩坑详解</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/anko-layout">Anko Layout</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/freeline-da-bao-liu-cheng-chu-tan">Freeline打包流程初探</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/android-leng-men-kai-fa-zhi-widget-kai-fa">Android冷门开发之 Widget 开发</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/dong-man-tui-jian-lesslessjun-noming-ha-greatergreater">动漫推荐 《君の名は。》</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu">BiliBili Android第三方——第2步</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-1-bu">BiliBili Android第三方——第1步</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-0-bu">BiliBili Android第三方——第0步</a>
-            </li>
-          
-        
-      </ul>
-    </div>
-  </div>
-  <div class="paper">
-    <div class="sidebar-title">
-      标签列表
-    </div>
-    <div class="row">
-      
-        <a href="https://hakuless.github.io//tag/tech" class="badge secondary">
-          Tech
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/android" class="badge warning">
-          Android
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="badge secondary">
-          Life
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/gEjrhrmNK" class="badge secondary">
-          Kotlin
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/6MiN8T9uX" class="badge success">
-          Anima
-        </a>
-      
-    </div>
-  </div>
-  <div class="paper">
-    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
-  </div>
-</div>
-
-
     </div>
 
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
@@ -409,6 +302,13 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 AOS.init();
 
 hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
 
 </script>
 
