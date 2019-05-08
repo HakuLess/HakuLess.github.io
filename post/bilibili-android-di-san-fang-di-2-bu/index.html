@@ -1,15 +1,18 @@
+
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" >
+    
+<meta charset="utf-8" >
 
 <title>BiliBili Android第三方——第2步 | HaKuLess</title>
-<meta name="description" content="温故而知新">
+<meta name="description" content="精神病人思路广，脑残儿童欢乐多">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557325276933">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557325520144">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
@@ -17,89 +20,89 @@
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
 
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
 
 
   </head>
   <body>
     <div id="app" class="main">
-
-      <div class="sidebar" :class="{ 'full-height': menuVisible }">
-  <div class="top-container" data-aos="fade-right">
-    <div class="top-header-container">
-      <a class="site-title-container" href="https://hakuless.github.io/">
-        <img src="https://hakuless.github.io//images/avatar.png?v=1557325276933" class="site-logo">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://hakuless.github.io/">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557325520144" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://hakuless.github.io/">
         <h1 class="site-title">HaKuLess</h1>
       </a>
-      <div class="menu-btn" @click="menuVisible = !menuVisible">
-        <div class="line"></div>
-      </div>
     </div>
-    <div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
       
         
-          <a href="/" class="site-nav">
+          <a href="/" class="menu purple-link">
             首页
           </a>
         
       
         
-          <a href="/archives" class="site-nav">
+          <a href="/archives" class="menu purple-link">
             归档
           </a>
         
       
         
-          <a href="/tags" class="site-nav">
+          <a href="/tags" class="menu purple-link">
             标签
           </a>
         
       
         
-          <a href="/post/about" class="site-nav">
+          <a href="/post/about" class="menu purple-link">
             关于
           </a>
         
       
     </div>
   </div>
-  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
-    <div class="social-container">
-      
-        
-          <a class="social-link" href="https://github.com/HakuLess" target="_blank">
-            <i class="fab fa-github"></i>
-          </a>
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    </div>
-    <div class="site-description">
-      温故而知新
-    </div>
-    <div class="site-footer">
-      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
-    </div>
-  </div>
-</div>
+</transition>
 
 
-      <div class="main-container">
-        <div class="content-container" data-aos="fade-up">
-          <div class="post-detail">
-            <h2 class="post-title">BiliBili Android第三方——第2步</h2>
-            <div class="post-date">2016-03-23</div>
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">BiliBili Android第三方——第2步</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2016-03-23</span>
             
-            <div class="post-content">
-              <h3 id="视频播放">视频播放</h3>
+              <span>
+                <i class="icon-pricetags-outline"></i>
+                
+                  <a href="https://hakuless.github.io//tag/tech">
+                    Tech
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/nR3LVeaXe">
+                    Life
+                    
+                  </a>
+                
+              </span>
+            
+          </div>
+          <div class="post-content">
+            <h3 id="视频播放">视频播放</h3>
 <p>bilibili的核心功能不用说，即播放视频 + 弹幕功能，本章主要讲述如何在Android中播放B站视频（争取下一章中加入弹幕功能）。首先，Android中播放视频使用Bilibili官方开源的ijkMediaPlayer，Android自带的MediaPlayer支持格式有限，无法满足Bilibili视频源的格式。ijkPlayer的github中展示了许多编译、修改的内容，对于仅需要使用的可以暂时不看。</p>
 <h4 id="获取视频地址">获取视频地址</h4>
 <p>视频主要分为2类，直播和点播，这两类的接口是不一样的。其中点播又有专辑、番剧等包含集数等概念的内容，需要播放不同内容。这里我们只讨论一个地址的那种，即单个视频。</p>
@@ -255,44 +258,47 @@ public void surfaceCreated(SurfaceHolder holder) {</p>
 * [B站API](http://www.fuckbilibili.com/biliapi.html)
 * [哔哩哔哩JJ](http://www.bilibilijj.com/)</code></pre>
 
-            </div>
-            
-              <div class="tag-container">
-                
-                  <a href="https://hakuless.github.io//tag/tech" class="tag">
-                    Tech
-                  </a>
-                
-                  <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="tag">
-                    Life
-                  </a>
-                
-              </div>
-            
-            
-              <div class="next-post">
-                <div class="next">下一篇</div>
-                <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-1-bu">
-                  <h3 class="post-title">
-                    BiliBili Android第三方——第1步
-                  </h3>
-                </a>
-              </div>
-            
-
-            
-
           </div>
-
         </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-1-bu">
+              <h3 class="post-title">
+                下一篇：BiliBili Android第三方——第1步
+              </h3>
+            </a>
+          </div>
+          
       </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">精神病人思路广，脑残儿童欢乐多</div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/HakuLess" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+
     </div>
-
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-
-<script type="application/javascript">
-
-AOS.init();
+    <script type="application/javascript">
 
 hljs.initHighlightingOnLoad()
 
