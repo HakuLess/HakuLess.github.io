@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Freeline打包流程初探 | HaKuLess</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557322742678">
+<link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://hakuless.github.io/">
+        <img src="https://hakuless.github.io//images/avatar.png?v=1557322742678" class="site-logo">
+        <h1 class="site-title">HaKuLess</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+          <a class="social-link" href="https://github.com/HakuLess" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      温故而知新
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Freeline打包流程初探</h2>
+            <div class="post-date">2017-05-11</div>
+            
+            <div class="post-content">
+              <p>点评、美团的Android App两者在业内都是巨量级的大小，对于开发来说编译耗时过长十分影响开发效率，在表层所能做的工作比较有限（module转为aar），节省仍有瓶颈。然而在使用Freeline的增量编译后，已经爱不释手，对开发效率有极大的提升，因此深入了解下其详细实现并对大家分享（安利）一下~</p>
+<!--more-->
+<h3 id="前言">前言</h3>
+<ol>
+<li>本文均基于freeline 0.87版本，因此在某些具体代码和流程上可能与其他版本有一定差异，请各位读者注意。</li>
+<li>目前笔者主要只看了freeline相关的代码，对于instantRun、Buck等只看了其他人的blog等信息，可能有误，需要读者判断</li>
+</ol>
+<h3 id="使用流程">使用流程</h3>
+<p>由于Freeline已经开源，教学式的流程就不在这里赘述，可以查看 <a href="https://github.com/alibaba/freeline">https://github.com/alibaba/freeline</a> 的 ReadMe
+以美团App 为例，初始化Freeline后，会新建如下一些文件，每个文件具体的用处会在下文详述，这里先给出大家一个列表
+<img src="http://ww3.sinaimg.cn/large/006tNbRwgy1ffhi6ie18ej319m0jwdi9.jpg" alt="">
+具体为在主module中，会增加一个freeline.py的文件 &amp; freeline文件夹 &amp; freeline_project_description.json Project配置文件，其中所有执行的代码都在freeline_core中
+接下来，我们将详细的说明freeline_core中的各个文件的用处</p>
+<h3 id="原生打包流程">原生打包流程</h3>
+<p>在讲Freeline的打包流程前，先让我们确认下Android打包的流程以及在我们点评、美团这种巨型App的打包过程中主要耗时在哪里
+<img src="http://ww2.sinaimg.cn/large/006tNbRwgy1ffhi8nwrtbj30i80koaaf.jpg" alt="">
+传统的打包流程每次构建都是一个全新的过程，没有任何 缓存 和 增量的过程，因此纯按照代码量和资源的大小决定编译时间，app越大该时间越长，对于美团、点评App大量的代码通过aar引用，只有oversea及common库是module引入的也要build很久（我的MBP 13 正常情况大概需要5分钟上下）</p>
+<p>注：其实oversea及oversea-common所占的比例极小，有的时候疏忽纯打aimeituan or nova，其实所用时间差距并不大</p>
+<h3 id="代码详解">代码详解</h3>
+<h4 id="文件结构">文件结构</h4>
+<p>首先，看一下下载下来的freeline的文件结构，只有两个文件夹和一个文件
+<img src="http://ww4.sinaimg.cn/large/006tNbRwgy1ffhi9rwl3rj309004a0sm.jpg" alt="">
+其中，freeline_core就是所有的python核心文件，全量、增量编译的逻辑和流程就在这个文件夹里，笔者主要阅读的也就是该文件夹中的内容。
+<img src="http://ww2.sinaimg.cn/large/006tNbRwgy1ffhig96bt1j30b00iy0t4.jpg" alt="">
+而release-tools 主要是修改了一些Android原本打包流程的工具，用于支持一些兼容细节，如aapt增加了对资源名称“.” 和 “_”的替换等（很多细节并不了解）
+<img src="http://ww1.sinaimg.cn/large/006tNbRwgy1ffhihrvzzxj30b20qodgi.jpg" alt=""></p>
+<p>下面进入重头戏的freeline_core，其实一共只有这些文件，代码行数也并不算多，与业务开发的代码量根本不是一个级别的，但是仔细看过代码后，发现设计思路很有感觉，在恰当的场合选择恰当的 数据结构 和 设计模式，自认为是在普通的业务开发中十分欠缺的（有固定的框架套路，反而缺少了自我思考的空间，希冀在自己感兴趣的方向维护自己的独立App，保持这种感觉）</p>
+<h4 id="代码逻辑">代码逻辑</h4>
+<h5 id="数据结构-task-task_engine">数据结构 task &amp; task_engine</h5>
+<p>首先介绍两个贯穿全局的、比较重要的数据结构 task &amp; task_engine，对应的文件就是 task.py &amp; task_engine.py</p>
+<pre><code>class Task(object):
+    def __init__(self, name):
+        self.name = name
+        self.parent_tasks = []
+        self.child_tasks = []
+ 
+        self.status = READY  # -1: failed; 0: not start; 1: waiting; 2: working; 3: success;
+        self.start_time = 0
+        self.run_start_time = 0
+        self.cost_time = 0
+        self.running_message = 'running...'
+        self.finished_message = 'finished.'
+        self.condition = threading.Condition()
+        self.interrupted_exception = None
+ 
+    def __repr__(self):
+        return &quot;[{}]&quot;.format(self.name)
+ 
+    def add_parent_task(self, task):
+        if task not in self.parent_tasks:
+            self.parent_tasks.append(task)
+            task.add_child_task(self)
+ 
+    def add_child_task(self, task):
+        if task not in self.child_tasks:
+            self.child_tasks.append(task)
+            task.add_parent_task(self)
+ 
+    def is_all_parent_finished(self):
+        for task in self.parent_tasks:
+            if task.status != SUCCESS and task.status != FAILURE:
+                return False
+        return True
+ 
+    def wait(self):
+        self.condition.acquire()
+        self.condition.wait()
+        self.condition.release()
+ 
+    def notify(self):
+        self.condition.acquire()
+        self.condition.notify()
+        self.condition.release()
+ 
+    def execute(self):
+        raise NotImplementedError
+ 
+    def can_show_log(self):
+        return self.status == SUCCESS or self.status == WORKING or self.status == FAILURE
+ 
+    def debug(self, message):
+        Logger.debug('[{}] {}'.format(self.name, message))
+</code></pre>
+<pre><code>class TaskEngine(object):
+    def __init__(self, logger):
+        self._logger = logger
+        self.queue = Queue.Queue()
+        self.condition = threading.Condition()
+        self.start_time = 0
+        self.cost_time = 0
+ 
+        self.pool = ThreadPool()
+        self.pool.start()
+ 
+        self._interrupt_exception = None
+        self._init_attr()
+        self.tpl_logger_message = '[task_engine] {}'
+ 
+    def _init_attr(self):
+        self.root_tasks = []
+        self.tasks_dict = {}
+        self.tasks_depth_dict = {}
+        self.sorted_tasks = []
+ 
+    def debug(self, message):
+        Logger.debug(self.tpl_logger_message.format(message))
+ 
+    def add_root_task(self, task):
+        if isinstance(task, list):
+            map(lambda t: self._add_root_task(t), task)
+        else:
+            self._add_root_task(task)
+ 
+    def start(self):
+        self.start_time = time.time()
+        self._interrupt_exception = None
+        self._prepare()
+        self.wait()
+ 
+        if self._interrupt_exception is not None:
+            raise self._interrupt_exception
+ 
+    def finish(self):
+        self.cost_time = time.time() - self.start_time
+        self.debug('it takes task engine {}s to execute tasks.'.format(round(self.cost_time, 2)))
+        self._init_attr()
+        self.notify()
+ 
+    def is_all_tasks_finished(self):
+        tasks = self.tasks_dict.values()
+        for task in tasks:
+            if task.status != 3 and task.status != -1:
+                return False
+        return True
+ 
+    def get_running_tasks(self):
+        tasks = self.tasks_dict.values()
+        return [task for task in tasks if task.status != 3 and task.status != -1]
+ 
+    def wait(self):
+        self.condition.acquire()
+        self.condition.wait()
+        self.condition.release()
+ 
+    def notify(self):
+        self.condition.acquire()
+        self.condition.notify()
+        self.condition.release()
+ 
+    def interrupt(self, exception):
+        self._interrupt_exception = exception
+        self.debug('task engine occurs exception, engine will exit.')
+ 
+    def _add_root_task(self, task):
+        if isinstance(task, Task) and task not in self.root_tasks:
+            self.root_tasks.append(task)
+ 
+    def _prepare(self):
+        tasks_queue = Queue.Queue()
+        for task in self.root_tasks:
+            tasks_queue.put(task)
+ 
+        has_added_tasks = []
+        while not tasks_queue.empty():
+            task = tasks_queue.get()
+            has_added_tasks.append(task)
+ 
+            if not self.tasks_dict.has_key(task.name):
+                self.tasks_dict[task.name] = task
+ 
+            for child in task.child_tasks:
+                if child not in has_added_tasks:
+                    tasks_queue.put(child)
+ 
+        depth_array = []
+ 
+        for task in self.tasks_dict.values():
+            depth = TaskEngine.calculate_task_depth(task)
+            if self.tasks_depth_dict.has_key(depth):
+                self.tasks_depth_dict[depth].append(task)
+            else:
+                self.tasks_depth_dict[depth] = []
+                self.tasks_depth_dict[depth].append(task)
+                depth_array.append(depth)
+ 
+        depth_array.sort()
+ 
+        for depth in depth_array:
+            tasks = self.tasks_depth_dict[depth]
+            for task in tasks:
+                self.debug(&quot;depth: {}, task: {}&quot;.format(depth, task))
+                self.sorted_tasks.append(task)
+ 
+        self._logger.set_sorted_tasks(self.sorted_tasks)
+ 
+        for task in self.sorted_tasks:
+            self.pool.add_task(ExecutableTask(task, self))
+</code></pre>
+<p>主要实现的效果就是一个 有向任务图 的关系，task拥有parent和child，只有在所有的parent都finish后才会执行child的task，同时task如果遭遇异常打断，直接关闭当前engine。task_engine管理6个独立线程的任务队列，TaskEngine向taskQueue中添加task，而每个Worker从中取出task执行，达到多任务并发的效果，一定程度上减少编译时间。</p>
+<p>下面就开始按照逻辑顺序来进行讲解！</p>
+<h5 id="freelinepy入口文件">freeline.py入口文件</h5>
+<p>最开始让我先看第一个文件，即执行命令所使用的 python freeline.py 中的 freeline.py文件</p>
+<p>在freeline.py中通过get_parser方法获取输入参数，然后通过Dispatcher进行转发，具体工作由参数转发后完成。该部分主要获取用户的输入参数，执行特定流程，没有特殊之处，不过可以通过主要输入来确认，freeline编译主要分为两种模式 全量模式（clean_build） &amp; 增量模式（inc_build）。经过dispatcher.py的转发后，在FreelineBuildCommand中，确认是进行全量编译or增量编译，代码如下：
+<img src="http://ww1.sinaimg.cn/large/006tNbRwgy1ffhinpgz5tj313m0gagnk.jpg" alt=""></p>
+<p>在FreelineBuildCommand.py文件中，判断是否需要clean来选择不同的build mode，返回为true（需要全量）的情况列表如下</p>
+<ol>
+<li>上次打包时间为0，即从来没有通过freeline编译</li>
+<li>root build.gradle文件有变化</li>
+<li>各个module的 config or manifest有变化，config是指freeline生成的freeline_project_description.json</li>
+<li>改变文件超过20个(java &amp; src)</li>
+</ol>
+<p>通过上述判断后，具体执行的命令在build_commands.py中进行配置，可以确认两种编译mode所执行的具体内容，如下图所示：
+<img src="http://ww3.sinaimg.cn/large/006tNbRwgy1ffhion9uxaj31au0rmq6y.jpg" alt=""></p>
+<h4 id="全量编译流程">全量编译流程</h4>
+<p>首先，要明确freeline是为增量编译而生的，全量编译不会比正常的执行./grdlew assembleDebug更快，反而因为在编译过程中会执行一些其他工作而耗时更长（增加很少，几乎无感知）。全量编译Log如下：
+<img src="http://ww2.sinaimg.cn/large/006tNbRwgy1ffhipbnkzdj314w0rctec.jpg" alt=""></p>
+<p>全量编译流程图如下：
+<img src="http://ww1.sinaimg.cn/large/006tNbRwgy1ffhipotvqrj31680wstb5.jpg" alt=""></p>
+<p>可以看出，流程图与Log相对应，共有4个层级，而核心工作在第二层 gradle_clean_build_task，该步骤执行具体的打包过程。下面我们通过代码来看上述流程图中的每个步骤都做了些什么。根据上述build_commonds.py所执行的command中，可以确认全量编译共执行5个command，我们分别来讲它们所做的事情（所有相关方法均在gradle_clean_build.py中）：</p>
+<ol>
+<li>CheckBulidEnvironmentCommand</li>
+<li>FindDependenciesOfTasksCommand</li>
+<li>GenerateSortedBuildTasksCommand</li>
+<li>UpdateApkCreatedTimeCommand</li>
+<li>ExecuteCleanBuildCommand</li>
+</ol>
+<h5 id="checkbulidenvironmentcommand">CheckBulidEnvironmentCommand</h5>
+<p>本方法主要做两件事情</p>
+<ol>
+<li>检查全局环境，获取adb的路径并且获取手机是否支持ART（判断版本号是否&gt;=20）</li>
+<li>看是否build过，如果build过 直接获取build的cache初始化project_info，如果没有build过就用根目录下的freeline_project_description.json初始化
+所有需要打包的本地module的路径及其所依赖的res、asset &amp; jar包的缓存路径
+其实所有的aar引用可以主要看做是上述三者文件内容merge到普通的打包流程中，另外还有manifest和R。资源文件打包arsc，jar包merge后一起打成一个或多个dex。</li>
+</ol>
+<h5 id="finddependenciesoftaskscommand">FindDependenciesOfTasksCommand</h5>
+<p>目前直接pass... 不知所措...</p>
+<h5 id="generatesortedbuildtaskscommand">GenerateSortedBuildTasksCommand</h5>
+<p>相当核心的部分，将所有的任务进行整理，利用最开始讲的task数据结构，按照上述全量流程图整理出task有向图，多个task关系整理。只有在所有的parent task都执行完成后，才会开始子任务的执行，按照一定顺序执行task。并行开展，减少时间（其实大头就一个，感知不太到减少多少）。核心部分内容放在下面详解！</p>
+<h5 id="updateapkcreatedtimecommand">UpdateApkCreatedTimeCommand</h5>
+<p>更新一个apktime文件，就是时间戳，用于记录使用freeline的build开始时间</p>
+<h5 id="executecleanbuildcommand">ExecuteCleanBuildCommand</h5>
+<p>开始执行生成的task有向图，即正式开始全量编译
+下面将把有向图中的task拆分详解</p>
+<h4 id="全量编译具体执行内容">全量编译具体执行内容</h4>
+<p>我将按照广度优先的策略来讲解全量编译中具体执行的task内容，首先可以看下生成task有向图部分的代码（其实与上述流程图 Log等略有重复）：</p>
+<pre><code>def generate_sorted_build_tasks(self):
+        # tasks' order:
+        # 1. generate file stat / check before clean build
+        # 2. clean build
+        # 3. install / clean
+        # 4. build base res / generate project info cache
+        build_task = GradleCleanBuildTask(self._config)
+        install_task = InstallApkTask(self._adb, self._config, wait_for_debugger=self._wait_for_debugger)
+        clean_all_cache_task = CleanAllCacheTask(self._config['build_cache_dir'], ignore=[
+            'stat_cache.json', 'stat_cache_md5.json', 'apktime', 'jar_dependencies.json', 'resources_dependencies.json',
+            'public_keeper.xml', 'assets_dependencies.json', 'freeline_annotation_info.json'])
+        build_base_resource_task = BuildBaseResourceTask(self._config, self._project_info)
+        generate_stat_task = GenerateFileStatTask(self._config)
+        append_stat_task = GenerateFileStatTask(self._config, is_append=True)
+        read_project_info_task = GradleReadProjectInfoTask(self._config)
+        generate_project_info_task = GradleGenerateProjectInfoTask(self._config)
+        generate_apt_file_stat_task = GenerateAptFilesStatTask()
+ 
+        # generate_stat_task.add_child_task(read_project_info_task)
+        build_task.add_child_task(clean_all_cache_task)
+        build_task.add_child_task(install_task)
+        clean_all_cache_task.add_child_task(build_base_resource_task)
+        clean_all_cache_task.add_child_task(generate_project_info_task)
+        clean_all_cache_task.add_child_task(append_stat_task)
+        clean_all_cache_task.add_child_task(generate_apt_file_stat_task)
+        read_project_info_task.add_child_task(build_task)
+        self._root_task = [generate_stat_task, read_project_info_task]
+</code></pre>
+<h5 id="第一梯队-generate_stat_task-read_project_info_task">第一梯队 generate_stat_task &amp; read_project_info_task</h5>
+<ol>
+<li>generate_stat_task：记录所有文件的状态（路径&amp;时间戳&amp;size），包括build.gradle manifest xml png，用于增量时判断文件的改动</li>
+<li>read_project_info_task：读取project信息，执行./gradlew -q checkBeforeCleanBuild（这就是为什么需要在 build.gradle 中增加 freeline 的插件的 原因之一）
+在根目录中生成freeline_project_description.json，保存着上述执行返回结果</li>
+</ol>
+<h5 id="第二梯队-gradle_clean_build_task">第二梯队  gradle_clean_build_task</h5>
+<p>最重要的核心部分，首先通过上述freeline_project_description初始化config。然后执行核心命令 默认的build命令后面添加freeline相关参数，如./gradlew :app:assembleDebug  -P freelineBuild=true。据官方人员的博客中所说，Freeline通过在编译过程中植入可替换代码，来绕过android签名的verify校验，否则直接push dex，校验发生异常将会直接crash。该过程与普通的热修复类似，可以查看其它热修复方案的文章。（主要还是由于没有自己阅读freeline-gradle-plugin的内容，作为下阶段的主要目标）</p>
+<h5 id="第三梯队-install_task-clean_all_cache_task">第三梯队 install_task &amp; clean_all_cache_task</h5>
+<p>build完成后，就是安装 和 清理缓存文件，详解如下：</p>
+<ol>
+<li>install_task：该过程分有很多小任务，如查看设备连接状态（设备数），命令行安装adb install -r xxxx，进入debug模式 adb shell am set-debug-app -w xxxx，打开初始页面 adb shell am start -n xxxx等</li>
+<li>将打包过程中生成的文件删除，忽略部分配置文件，无特殊内容</li>
+</ol>
+<h5 id="第四梯队-build_base_resource_task-generate_project_info_task-append_stat_task-generate_apt_file_stat_task">第四梯队 build_base_resource_task &amp; generate_project_info_task &amp; append_stat_task  &amp; generate_apt_file_stat_task</h5>
+<ol>
+<li>build_base_resource_task：生成资源基线，public_keeper.xml</li>
+<li>generate_project_info_task：生成project_info_cache.json，记录参与编译的module的路径及所依赖的资源jar包 res资源 及 assets 缓存的路径</li>
+<li>append_stat_task：更新保存文件状态的文件，stat_cache.json &amp; stat_cache_md5.json</li>
+<li>generate_apt_file_stat_task：更新apt_files_stat_cache.json，对使用databinding单独做的处理
+至此完成全量编译整体流程，可以看出除了正常的编译流程外，额外为了增量编译做了许多准备工作，这些工作的详细用处，我们将在下面的内容一一展开，保证会有一种解开谜题的快感~</li>
+</ol>
+<h4 id="增量编译整体流程">增量编译整体流程</h4>
+<p>与全量编译相对应，增量编译的流程图如下：
+<img src="http://ww1.sinaimg.cn/large/006tNbRwgy1ffhiuvbg2cj30wq0xcq4p.jpg" alt="">
+<img src="http://ww1.sinaimg.cn/large/006tNbRwgy1ffhj13be4cj30vo0weta1.jpg" alt=""></p>
+<p>上图是笔者所画流程图，由于task list没有展开，所以看上去有些抽象，下图为freeline作者博客上的流程图，更加直观的讲述执行的流程。让我们按照全量的流程，来对应的讲解下增量的过程，首先上图，增量编译的部分Log：
+<img src="http://ww2.sinaimg.cn/large/006tNbRwgy1ffhj31ziw6j31600agdhq.jpg" alt="">
+直观的看出，与全量编译不同（层级固定为4），增量编译的层级受到修改的module的依赖关系影响，层级可能会增加很多。比如只在oversea-commons进行了修改，oversea与aimeituan也需要重新编译，并且有严格的顺序关系，如上图所示，共有9层层级。下面同样按照广度优先的顺序，讲述下执行的每个方法及具体内容。</p>
+<h5 id="第一梯队-connect_task-aapt_task">第一梯队 connect_task &amp; aapt_task</h5>
+<ol>
+<li>connect_task：这个链接与普通的adb是不同的，而是与手机建立tcp长链，并通过独立的进程运行，防止app crash或者其他异常影响增量编译，保证增量包的传输过程稳定</li>
+<li>aapt_task：通过FreelineAapt命令对所有需要修改的资源重新打包（无改动部分利用缓存）
+-A 编译 assets<br>
+-S 编译 res
+--buildIncrement 修改需要修改的文件（修改的xml freeline_id_keeper_public.xml freeline_id_keeper_ids.xml）
+联合所有的缓存路径 生成主module下的respack/[主module].pack
+简要命令demo如下：
+freeline/release-tools/FreelineAapt package -f -I /Users/HaKu/Library/Android/sdk/platforms/android-23/android.jar
+-M /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/intermediates/manifests/full/debug/AndroidManifest.xml
+-S /Users/HaKu/WorkSpace/Android/AndAssistant/app/src/main/res
+-S /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/generated/res/rs/debug
+-S /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/generated/res/resValues/debug
+-S /Users/HaKu/.android/build-cache/26b9437cfc7c439d3bb8583516dbd751ed3e45fb/output/res
+-S /Users/HaKu/.android/build-cache/8b7a69da9d3a7ed34f964734b35e17097bf48bf2/output/res
+-S /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/freeline/app/backup/res
+-A /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/freeline/freeline-assets
+-A /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/generated/assets/shaders/debug
+-A /Users/HaKu/.android/build-cache/26b9437cfc7c439d3bb8583516dbd751ed3e45fb/output/assets
+-A /Users/HaKu/.android/build-cache/8b7a69da9d3a7ed34f964734b35e17097bf48bf2/output/assets
+--custom-package com.less.haku.assistant
+-m -J /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/freeline/app/backup
+--auto-add-overlay -P /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/freeline/app/backup/res/values/freeline_id_keeper_public.xml
+-F /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/freeline/app/respack/app.pack
+--debug-mode --auto-add-overlay --no-version-vectors --buildIncrement
+res/layout/activity_main.xml:res/values/freeline_id_keeper_public.xml:res/values/freeline_id_keeper_ids.xml
+--resoucres-md5-cache-path /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/freeline/arsc_cache.dat
+--ignore-assets public_id.xml:public.xml:<em>.bak:.</em>
+--ignore-ids avd_hide_password_1:avd_hide_password_2:avd_hide_password_3:avd_show_password_1:avd_show_password_2:avd_show_password_3</li>
+</ol>
+<p>具体内容还要根据FreelineAapt命令确认，与普通的aapt差异不明确</p>
+<h5 id="第2-~-n-3-梯队-javac-dex-merge-dex">第2 ~ n-3 梯队 javac dex merge-dex</h5>
+<p>这部分的代码很有感觉，最大程度上的精简增量编译所需要的工作
+首先，在预处理中，把所有的module增量task按照module的依赖顺序生成task有向图（最底层的module作为图的root）</p>
+<p>把所有root节点加入到aapt_task的child中，然后再把所有的叶子节点都增加merge_dex_task后再增加sync_task，保证在所有的module增量完成后再将增量包同步到客户端，达到增量编译的效果。这个阶段，让我们来具体看下2个方法，module增量执行的 gradle_{module}_compile_command &amp; merge_dex_task</p>
+<ol>
+<li>gradle_{module}_compile_command：每个修改的module都将执行该命令，主要包含两个方法，JavacCommand &amp; DexCommand
+JavacCommand 通过javac命令生成classes，生成路径为相应module的classes
+DexCommand  如果有java文件改变则会执行run_dex_task方法，执行的dex命令如 freeline/release-tools/dx --dex --no-optimize --force-jumbo --multi-dex --output=/Users/HaKu/WorkSpace/Android/AndAssistant/app/build/freeline/app/dex /Users/HaKu/WorkSpace/Android/AndAssistant/app/build/freeline/app/classes
+该dex命令也是经过修改后的，可能执行了某些优化</li>
+<li>merge_dex_task：获取增量dex，并进行merge。只改变common库的命令如下 freeline/release-tools/dx --dex --no-optimize --force-jumbo --multi-dex --output=/Users/HaKu/WorkSpace/Android/aimeituan/aimeituan/aimeituan/build/freeline/oversea-commons/dex /Users/HaKu/WorkSpace/Android/aimeituan/aimeituan/aimeituan/build/freeline/oversea-commons/classes，如果dex数等于1个，则只需要把需要的dex copy to merged.dex就可以了，如果需要修改的merge_dexes超过1个，则需要使用DexMerge命令 java -jar freeline/release-tools/DexMerge.jar /Users/HaKu/WorkSpace/Android/aimeituan/aimeituan/aimeituan/build/freeline/freeline-dexes/merged.dex /Users/HaKu/WorkSpace/Android/aimeituan/aimeituan/aimeituan/build/freeline/oversea-commons/dex/classes2.dex /Users/HaKu/WorkSpace/Android/aimeituan/aimeituan/aimeituan/build/freeline/oversea/dex/classes2.dex
+主要通过上述两个过程产生核心的增量dex，每条路径的生成的1个或多个dex 一次性merge到merge.dex中，在全部的路径都完成后，开始执行下面的sync命令</li>
+</ol>
+<h5 id="第n-2梯队-sync">第n-2梯队 sync</h5>
+<p><img src="http://ww3.sinaimg.cn/large/006tNbRwgy1ffhj6ejxsuj31860d2myd.jpg" alt=""></p>
+<p>如上图所示，顺序为同步资源、dex、native、文件状态的顺序，下面讲解下每个同步过程中同步的文件：</p>
+<ol>
+<li>res：同步主module的资源pack，在freeline/respack路径下，[module名称].pack文件，由freeline_aapt生成的资源增量包（资源增量pack只有一个）</li>
+<li>dex：把每个module的dex都推送到手机上（由于无法确定修改会对上层调用有影响，因此只能每个module都推送dex）</li>
+<li>native：推送so文件，压缩为natives.zip</li>
+<li>state：同步缓存文件的状态，并根据是否需要重启应用，so文件的改变需要重启应用</li>
+</ol>
+<h3 id="感想">感想</h3>
+<ol>
+<li>freeline大量运用多态，python不是很熟悉，但是写法与Java的虚类很像~</li>
+<li>下一步的内容主要看freeline的gradle插件，看实际Freeline命令做了些什么</li>
+<li>对于instantRun和Buck等其他增量方案的具体实现不了解，只通过其他人的文章看，需要看代码进行比较</li>
+<li>还有许多黑科技没有探寻，比如如何实现可以debug？为支持如databinding等接口做了哪些工作？资源增量的详细过程，pack包如何在手机端生效？</li>
+</ol>
+<h3 id="thanks-to">Thanks To</h3>
+<p><a href="http://blog.ayong.me/2016/10/26/Freeline%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0Gradle%E5%B7%A5%E7%A8%8B%E4%B8%8A%E7%9A%84%E5%A2%9E%E9%87%8F%E7%BC%96%E8%AF%91/#more">Freeline：如何实现 Gradle 工程上的增量编译？</a></p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://hakuless.github.io//tag/tech" class="tag">
+                    Tech
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/android" class="tag">
+                    Android
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://hakuless.github.io//post/android-leng-men-kai-fa-zhi-widget-kai-fa">
+                  <h3 class="post-title">
+                    Android冷门开发之 Widget 开发
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>
