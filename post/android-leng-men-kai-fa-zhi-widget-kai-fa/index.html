@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Android冷门开发之 Widget 开发 | HaKuLess</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557322324456">
+<link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://hakuless.github.io/">
+        <img src="https://hakuless.github.io//images/avatar.png?v=1557322324456" class="site-logo">
+        <h1 class="site-title">HaKuLess</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      温故而知新
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Android冷门开发之 Widget 开发</h2>
+            <div class="post-date">2016-12-28</div>
+            
+            <div class="post-content">
+              <p>桌面插件，作为Android开发中很有意思的一部分，但是在平常的业务开发中很少接触。本篇wiki给大家做个基础的普及，并通过内部交流app完成基本功能，让大家对widget内容实现代码有一定的了解。</p>
+<!--more-->
+<h3 id="预备知识">预备知识</h3>
+<p><a href="https://developer.android.com/guide/topics/appwidgets/index.html">Google官方文档</a></p>
+<h4 id="widget开发种类">widget开发种类</h4>
+<p>首先，看<a href="https://developer.android.com/design/patterns/widgets.html">widget开发种类</a>，主要分为信息类（天气）、集合类（头条）、控制类（七件）、混合类（音乐）。在实际开发中，功能与这种类别关系不大，根据需求来实现相应功能即可。</p>
+<h4 id="widget开发限制">widget开发限制</h4>
+<ol>
+<li>手势 只支持touch和垂直滑动</li>
+<li>元素 一小部分View</li>
+</ol>
+<h3 id="具体开发过程">具体开发过程</h3>
+<ol>
+<li>AppWidgetProviderInfo provider的xml，需要注册在Manifest中</li>
+<li>AppWidgetProvider class implementation，实现自己的插件类，继承AppWidgetProvider</li>
+<li>layout xml，类似于普通的Activity，但有诸多限制</li>
+</ol>
+<p>其中，对于ListView和GridView还需要注册Service提供数据，与普通的使用方式不一样。并且widget内部view间的交互，没有直接onClick事件等，均通过intent实现。通过IntentFilter拦截不同的事件进行处理，如android.appwidget.action.APPWIDGET_UPDATE。</p>
+<h4 id="注册插件">注册插件</h4>
+<pre><code>&lt;receiver android:name=&quot;CheckWidget&quot;&gt;
+    &lt;intent-filter&gt;
+        &lt;action android:name=&quot;android.appwidget.action.APPWIDGET_UPDATE&quot; /&gt;
+        &lt;action android:name=&quot;CHECK_START&quot; /&gt;
+        &lt;action android:name=&quot;CHECK_FINISH&quot; /&gt;
+    &lt;/intent-filter&gt;
+
+    &lt;meta-data
+        android:name=&quot;android.appwidget.provider&quot;
+        android:resource=&quot;@xml/check_in_widget_provider&quot; /&gt;
+&lt;/receiver&gt;
+</code></pre>
+<p>注册插件主要有两个关键点，一个是intentFilter，需要在其中拦截需要的事件。另一个是meta-data中的插件信息，最小高度、宽度、是否允许拉伸等等。（选择插件时，大家能看到的4x1 4x2 2x3等信息，就是通过这里的宽高确定的）。并且在provider中会给出layout的信息，如下：</p>
+<pre><code>&lt;appwidget-provider xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:initialLayout=&quot;@layout/checkin_res_widget_layout&quot;
+    android:minHeight=&quot;0dp&quot;
+    android:minWidth=&quot;300dp&quot;
+    android:resizeMode=&quot;vertical&quot;
+    android:updatePeriodMillis=&quot;0&quot; /&gt;
+</code></pre>
+<h4 id="开发widget">开发widget</h4>
+<p>widget有自己独特的生命周期，不同于Activity或Fragment。</p>
+<ol>
+<li>onEnabled方法：此方法在Widget第一次被创建的时候调用。</li>
+<li>onReceive方法：接收广播调用，执行操作的方法，如响应按钮事件等。</li>
+<li>onUpdate：用于widget更新，可主动调用，默认按照updatePeriodMillis调用。</li>
+<li>onDeleted：widget被删除时调用的方法。</li>
+<li>onDisabled：所有Widget被删除是调用的方法。</li>
+</ol>
+<p>widget开发，需要继承AppWidgetProvider类，详细代码如下：</p>
+<pre><code>public class CheckResWidget extends AppWidgetProvider {
+
+    @Override
+    public void onEnabled(Context context) {
+        super.onEnabled(context);
+    }
+
+    @Override
+    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
+
+        final int length = appWidgetIds.length;
+
+        Intent intent = new Intent(&quot;CHECK_RES_START&quot;);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+
+
+        // Perform this loop procedure for each App Widget that belongs to this provider
+        for (int i = 0; i &lt; length; i++) {
+            int appWidgetId = appWidgetIds[i];
+            // Get the layout for the App Widget and attach an on-click listener
+            // to the button
+            RemoteViews views = new RemoteViews(context.getPackageName(),
+                    R.layout.checkin_res_widget_layout);
+            views.setOnClickPendingIntent(R.id.widget_check_in_res_btn, pendingIntent);
+
+            //改变图片和文本
+            views.setTextViewText(R.id.widget_check_in_result_res, mResult);
+
+            Intent gridIntent = new Intent(context, CheckResultWidgetService.class);
+            gridIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
+
+            views.setRemoteAdapter(R.id.widget_check_in_res_result_grid, gridIntent);
+
+            // Tell the AppWidgetManager to perform an update on the current app widget
+            appWidgetManager.updateAppWidget(appWidgetId, views);
+
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId,
+                    R.id.widget_check_in_res_result_grid);
+        }
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+        if (intent.getAction().equals(&quot;CHECK_RES_START&quot;)) {
+            //在这编写接收到该Action后要实现的动作
+            mResult = &quot;CHECK_RES_START&quot;;
+            initService(context);
+        } else if (intent.getAction().equals(&quot;CHECK_RES_FINISH&quot;)) {
+            mResult = &quot;CHECK_RES_FINISH&quot;;
+        }
+    }
+
+    /**
+     * 根据参数更新
+     */
+    private void updateWidget(Context context) {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(
+                context.getApplicationContext());
+        ComponentName thisWidget = new ComponentName(context.getApplicationContext(),
+                CheckResWidget.class);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+        if (appWidgetIds != null &amp;&amp; appWidgetIds.length &gt; 0) {
+            onUpdate(context, appWidgetManager, appWidgetIds);
+        }
+    }
+
+    private void initService(Context context) {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .build();
+
+        mService = retrofit.create(?.class);
+
+        sendReq(context);
+    }
+
+
+    private void sendReq(final Context context) {
+        
+        // 发送网络请求并接收回调
+        call.enqueue(new Callback&lt;?&gt;() {
+            @Override
+            public void onResponse(Call&lt;?&gt; call,
+                    Response&lt;?&gt; response) {
+                // 正确处理数据后，更新UI
+                updateWidget(context);
+            }
+
+            @Override
+            public void onFailure(Call&lt;Result&lt;CheckDetail&gt;&gt; call, Throwable t) {
+                // 错误处理数据后，更新UI
+                updateWidget(context);
+            }
+        });
+    }
+}
+</code></pre>
+<p>上述代码明显看出更新UI的逻辑与普通的Activity不一样，需要通过使用RemoteView才能对TextView等进行操作，并且对于ListView、GridView等还需要建一个新的RemoteViewsService用于绑定数据。</p>
+<p>比如一个TextView.setText不能直接使用，而需要使用remoteViews.setTextViewText(id, string)，第一个参数是textview的id，第二个参数是string。</p>
+<h4 id="开发remoteviewservice">开发RemoteViewService</h4>
+<p>对于widget中的ListView和GridView，没有办法直接使用Adapter绑定数据，只能通过RemoteViewService创建RemoteViewsFactory</p>
+<pre><code>public class CheckResultWidgetService extends RemoteViewsService {
+
+    @Override
+    public RemoteViewsFactory onGetViewFactory(Intent intent) {
+        return new GridRemoteViewsFactory(this.getApplicationContext(), intent);
+    }
+}
+
+class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
+
+    @Override
+    public void onCreate() {
+
+    }
+
+    @Override
+    public void onDataSetChanged() {
+    }
+
+    @Override
+    public void onDestroy() {
+
+    }
+
+    @Override
+    public int getCount() {
+    
+    }
+    
+    @Override
+    public RemoteViews getViewAt(int i) {
+        
+    }
+
+    @Override
+    public RemoteViews getLoadingView() {
+        return null;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 1;
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return i;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+}
+
+</code></pre>
+<p>返回实现RemoteViewsFactory接口的实体类，通过notifyDataSetChanged调用factory刷新数据，与正常adapter类似。备注个小坑：默认getViewTypeCount返回0，不会使用getViewAt中的View，需要返回至少是1（也没有RecyclerView那种viewtype绑定数据，不知道这个有啥用...）</p>
+<h3 id="总结">总结</h3>
+<p>Android开发有很多平时业务开发接触不到的东西，有很多很不错的功能都接触较少，不能总局限于自己业务开发那一小撮。像widget开发、3Dtouch及一些Android新功能都不了解，需要多多学习下。</p>
+<p>整体项目的git地址链接：
+git@bitbucket.org:diablos/magiccheckin.git</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://hakuless.github.io//tag/tech" class="tag">
+                    Tech
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/android" class="tag">
+                    Android
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://hakuless.github.io//post/dong-man-tui-jian-lesslessjun-noming-ha-greatergreater">
+                  <h3 class="post-title">
+                    动漫推荐 《君の名は。》
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

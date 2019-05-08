@@ -1,88 +1,102 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-<meta name="description" content="" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2017年终总结 | Gridea</title>
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557319659365">
+    <meta charset="utf-8" >
+
+<title>2017年终总结 | HaKuLess</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557322324456">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
 
 
   </head>
   <body>
-    <div class="main">
-      <div class="main-content">
-        <div class="site-header">
-  <a href="https://hakuless.github.io/">
-  <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557319659365" alt="">
-  </a>
-  <h1 class="site-title">
-    Gridea
-  </h1>
-  <p class="site-description">
-    温故而知新
-  </p>
-  <div class="menu-container">
-    
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://hakuless.github.io/">
+        <img src="https://hakuless.github.io//images/avatar.png?v=1557322324456" class="site-logo">
+        <h1 class="site-title">HaKuLess</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
       
-        <a href="/" class="menu">
-          首页
-        </a>
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
       
-    
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
       
-        <a href="/archives" class="menu">
-          归档
-        </a>
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
       
-    
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
       
-        <a href="/tags" class="menu">
-          标签
-        </a>
-      
-    
-      
-        <a href="/post/about" class="menu">
-          关于
-        </a>
-      
-    
+    </div>
   </div>
-  <div class="social-container">
-    
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
       
-    
+        
       
-    
+        
       
-    
+        
       
-    
+        
       
-    
+        
+      
+    </div>
+    <div class="site-description">
+      温故而知新
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
   </div>
 </div>
 
-      
-        <div class="post-detail">
-          <article class="post">
-            <h2 class="post-title">
-              2017年终总结
-            </h2>
-            <div class="post-info">
-              <time class="post-time">
-                · 2018-02-13 ·
-              </time>
-              
-            </div>
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">2017年终总结</h2>
+            <div class="post-date">2018-02-13</div>
             
             <div class="post-content">
               <p>2017算是毕业之后过的最Happy的一年了，没有别的原因，就是终于有点小钱了..</p>
+<!--more-->
 <h2 id="生活">生活</h2>
 <h3 id="玩">玩</h3>
 <p>生活虽然不是一团糟，但个人方面还是没什么进步。健身也没有坚持住，Keep就5月到10月... 之后虽然也有和<a href="http://alighters.com/">大佬</a> &amp; 雨霏老师等人一起去打羽毛球，但还是像<strong>老实</strong>说的 “运动量不够啊”。本年度还是要加强运动，当然该玩玩（该玩还是要玩的简称）... 像今年在羽毛球风盛行之前的台球风，还有跟雨霏老师、师母一起滑冰，还有保龄球（上一次打估计要追溯到在大庆跟高中同学一起打了），看看今年能不能跟<strong>老实</strong>一起去打打篮球。</p>
@@ -179,22 +193,53 @@
 新的一年还是没想找女朋友（也没有不想找！！）</p>
 
             </div>
-          </article>
+            
+              <div class="tag-container">
+                
+                  <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="tag">
+                    Life
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie">
+                  <h3 class="post-title">
+                    Android Camera踩坑详解
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
         </div>
-    
-        
-
-        
-    
-        <div class="site-footer">
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
-</div>
-
-<script>
-  hljs.initHighlightingOnLoad()
-</script>
-
       </div>
     </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
   </body>
 </html>

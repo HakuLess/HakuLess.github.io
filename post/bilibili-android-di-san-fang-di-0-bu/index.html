@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>BiliBili Android第三方——第0步 | HaKuLess</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557322324456">
+<link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://hakuless.github.io/">
+        <img src="https://hakuless.github.io//images/avatar.png?v=1557322324456" class="site-logo">
+        <h1 class="site-title">HaKuLess</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      温故而知新
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">BiliBili Android第三方——第0步</h2>
+            <div class="post-date">2016-01-21</div>
+            
+            <div class="post-content">
+              <p>该项目的原因稍后再写，想开发BiliBili的Android第三方客户端总会有几个必须要跨过的坎，我们第0步主要就是为了这些而做的准备。</p>
+<!--more-->
+<h3 id="后台服务">后台服务</h3>
+<p>已经很少有App能过脱离后台服务而独立运行，即便一些单机游戏也需要通过网络加载新的游戏关卡等，而我们做第三方App也同样需要后台服务的支持（除非只是想模拟UI，而非真实的功能）。</p>
+<p>目前第三方客户端获取后台服务主要通过两种方式：</p>
+<ol>
+<li>官方发布并维护一些开放API，供个人或其他团队开发人员进行个性化的开发。目前该种方式也逐渐没落了，仅存豆瓣、QQ等为数不多的几个开放平台仍在，目前BiliBili及许多大厂基本都已经关闭了个人开发者对第三方接口的申请。可能是维护开放API的成本要远大于所带来的引流的收获，可能国内开发人员也没有那么多时间去玩别家的开放API，为了生活就已经筋疲力尽了...</li>
+<li>通过了解官方API的验签方式，而使用规范的官方API进行调用。其实，这种方式跟捡到一张银行卡，然后猜密码差不多（不过还好没有错误限制，可以一直试下去），不过因为签名方式不像银行密码那么简单就是6位整型数，而是无限种的加密方式。不过还好，常规方式就那么几种，就好像银行密码要么123456，要么6个0一样，猜个几次就能够猜的出来。</li>
+</ol>
+<p>para + 排序 + appsecret + md5 拼sign</p>
+<p>原来key1=value1&amp;key2=value2&amp;key3=value3，拼装后</p>
+<ol>
+<li>value1value2value3</li>
+<li>key1value1key2value2key3value3</li>
+<li>key1=value1&amp;key2=value2&amp;key3=value3</li>
+</ol>
+<p>再加上关键key，私钥：appsecret=ea85624dfcf12d7cc7b2b3a94fac1f2c</p>
+<p>然后一起md5，得到sign，服务端验证sign是否一致，不一致的请求拦截掉，防止第三方随意调用。</p>
+<h3 id="工具">工具</h3>
+<h4 id="charles">Charles</h4>
+<p>使用charles进行截包，分析具体按钮的请求及返回json数据</p>
+<h4 id="dex2jar">dex2jar</h4>
+<p>用于反编译apk提取jar包，查看java源代码（可能被混淆）</p>
+<h4 id="jd-gui-luyten">JD-GUI luyten</h4>
+<p>用于查看反编译后的java代码</p>
+<h4 id="apktool">apktool</h4>
+<p>主要用于获取资源文件，如查看布局、获得资源图片等</p>
+<h4 id="ida">IDA</h4>
+<p>主要用于反汇编.so文件</p>
+<h3 id="工作流程">工作流程</h3>
+<ol>
+<li>使用apktool反编译apk文件，获取资源文件</li>
+<li>使用dex2jar反编译apk文件，获取Java代码（可能被混淆）</li>
+<li>使用Charles截取想要重现的请求(也可以通过Log获取发送请求URL，一般会将在Log中打出网络请求)</li>
+<li>根据分析代码，判断所需在哪个so中</li>
+<li>猜测（猜想 + 测试），验证签名方式，并通过实际请求验证</li>
+</ol>
+<h3 id="详细内容">详细内容</h3>
+<h4 id="一-反编译apk">一、反编译apk</h4>
+<ul>
+<li>
+<p>在BiliBili官网下载<a href="http://app.bilibili.com/">官方apk</a></p>
+<p>![下载Android版BiliBili](https://github.com/HakuLess/ImageLib/blob/master/blog/apk%E4%B8%8B%E8%BD%BD%E9%80%89%E6%8B%A9.png?raw=true =200x200)</p>
+</li>
+<li>
+<p>使用 apktool 和 dex2jar 反编译apk文件。</p>
+<pre><code>  apktool apktool d /Users/HaKu/Downloads/BiliPlayer3.apk -f
+  
+  ./d2j-dex2jar.sh /Users/HaKu/Downloads/app-debug.apk
+</code></pre>
+<p>![进行反编译](https://github.com/HakuLess/ImageLib/blob/master/blog/apktool.png?raw=true =400x150)</p>
+</li>
+<li>
+<p>使用 JD-GUI 和 IDA 分析代码</p>
+<p>![通过GUI查看代码](https://github.com/HakuLess/ImageLib/blob/master/blog/gui.png?raw=true =600x300)
+通过查找GUI可以看出关于appsecret部分B站APP并没有直接写入在java代码中，而是在bili的so库中，也算是对代码的一种保护，因此需要继续下去使用IDA分析so库的内容。</p>
+<p>![通过IDA查看汇编代码](https://github.com/HakuLess/ImageLib/blob/master/blog/ida_biliso.jpeg?raw=true =600x300)
+此处红框包围的代码即APP调用so方法获取appsecret的地方，这里把具体内容隐藏，有兴趣的朋友可以直接自己操作一遍获取内容。</p>
+</li>
+</ul>
+<h4 id="二-通过测试确定签名方式">二、通过测试确定签名方式</h4>
+<ul>
+<li>
+<p>建立Demo项目，通过截包确定需要签名的请求</p>
+<p>挑选一个需要签名的请求，本例使用直播页的请求：具体URL为</p>
+<pre><code>  http://live.bilibili.com/AppIndex/home?_device=android&amp;_hwid=51e96f5f2f54d5f9&amp;_ulv=10000&amp;access_key=563d6046f06289cbdcb472601ce5a761&amp;appkey=c1b107428d337928&amp;build=410000&amp;platform=android&amp;scale=xxhdpi&amp;sign=fbdcfe141853f7e2c84c4d401f6a8758
+</code></pre>
+<p>随便修改下参数发现返回为“api sign invalid”，证明该请求有sign验证。</p>
+</li>
+<li>
+<p>通过更改参数 + 猜测签名方式，请求验证，看是否被拒绝</p>
+<p>经验证发现，签名为上述第三种方式，将所有参数（包括变量名和值及=&amp;符号）排序后加上appsecret（只有值）之后做md5，得到返回结果即为所求sign值</p>
+</li>
+</ul>
+<hr>
+<h3 id="完成">完成</h3>
+<p>至此，已经完成了真正后台服务的获取，并可以通过官方的方式进行调用，也因为APP即便发新版也需要支持旧版的运行，因此短期内不用担心官方更换secret或者更换签名的生成方式。最后，这只是完成客户端开发的第一步，也算是其中的第一个难点。UI和业务逻辑等都不能属于技术难点，本系列将着力于描述开发第三方BiliBili客户端遇到的坑，当然个人开发不可能包含整个APP的功能，因此只会逐步实现相关功能，目前仅完成直播首页（没有直播间）和新番查询两个功能，将继续利用空闲时间进行开发，并采用些新技术，用于日常工作使用前的demo开发。</p>
+<hr>
+<p>Android开发新手，若有错误请指出，谢谢~</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://hakuless.github.io//tag/tech" class="tag">
+                    Tech
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/android" class="tag">
+                    Android
+                  </a>
+                
+              </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>
