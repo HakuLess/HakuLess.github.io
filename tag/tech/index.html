@@ -1,456 +1,405 @@
+
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" >
+    
+<meta charset="utf-8" >
 
 <title>Tech | HaKuLess</title>
 <meta name="description" content="温故而知新">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557322930878">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557322994368">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
 
-
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
 
   </head>
   <body>
-    <nav class="navbar border fixed split-nav">
-  <div class="nav-brand">
-    <h3><a href="https://hakuless.github.io/">HaKuLess</a></h3>
-  </div>
-  <div class="collapsible">
-    <input id="collapsible1" type="checkbox" name="collapsible1">
-    <button>
-      <label for="collapsible1">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-      </label>
-    </button>
-    <div class="collapsible-body">
-      <ul class="inline">
-        
-          <li>
-            
-              <a href="/" class="menu">
-                首页
-              </a>
-            
-          </li>
-        
-          <li>
-            
-              <a href="/archives" class="menu">
-                归档
-              </a>
-            
-          </li>
-        
-          <li>
-            
-              <a href="/tags" class="menu">
-                标签
-              </a>
-            
-          </li>
-        
-          <li>
-            
-              <a href="/post/about" class="menu">
-                关于
-              </a>
-            
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div id="top" class="row site">
-      <div class="sm-12 md-8 col">
-        <div class="paper">
-          <h2 class="current-tag">标签: Tech</h2>
-          
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://hakuless.github.io//post/arraylistsort-cai-keng-zhi-lu">ArrayList.sort踩坑之旅</a>
-    </h2>
-    <p class="article-meta">
-      2018-04-09
-      
-        <a href="https://hakuless.github.io//tag/tech" class="badge ">
-          Tech
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/android" class="badge ">
-          Android
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://hakuless.github.io//post/arraylistsort-cai-keng-zhi-lu" class="readmore-link">
-        <button>
-          Read More
-        </button>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://hakuless.github.io/">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557322994368" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://hakuless.github.io/">
+        <h1 class="site-title">HaKuLess</h1>
       </a>
     </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie">Android Camera踩坑详解</a>
-    </h2>
-    <p class="article-meta">
-      2017-12-12
-      
-        <a href="https://hakuless.github.io//tag/tech" class="badge ">
-          Tech
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/android" class="badge ">
-          Android
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
     </div>
-  </article>
+  </div>
+</div>
 
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://hakuless.github.io//post/anko-layout">Anko Layout</a>
-    </h2>
-    <p class="article-meta">
-      2017-11-07
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
       
-        <a href="https://hakuless.github.io//tag/gEjrhrmNK" class="badge success">
-          Kotlin
-        </a>
+        
+          <a href="/" class="menu purple-link">
+            首页
+          </a>
+        
       
-        <a href="https://hakuless.github.io//tag/tech" class="badge success">
-          Tech
-        </a>
+        
+          <a href="/archives" class="menu purple-link">
+            归档
+          </a>
+        
       
-        <a href="https://hakuless.github.io//tag/android" class="badge warning">
-          Android
-        </a>
+        
+          <a href="/tags" class="menu purple-link">
+            标签
+          </a>
+        
       
-    </p>
-    <p class="text-lead">
-      <p><a href="https://github.com/Kotlin/anko/wiki/Anko-Layouts#why-anko-layouts">github说明</a>
+        
+          <a href="/post/about" class="menu purple-link">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+
+        <div class="current-tag-container">
+          <h2 class="title">
+            <i class="icon icon-pricetags-outline"></i> Tech
+          </h2> 
+        </div>
+
+        
+<section class="post-item">
+    <div class="content">
+      <a href="https://hakuless.github.io//post/arraylistsort-cai-keng-zhi-lu">
+        <h2 class="post-title">ArrayList.sort踩坑之旅</h2>
+      </a>
+      <div class="post-abstract">
+        
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2018-04-09</span>
+        
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://hakuless.github.io//tag/tech">
+                Tech
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://hakuless.github.io//tag/android">
+                Android
+                
+              </a>
+            
+          </span>
+        
+      </div>
+    </div>
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie">
+        <h2 class="post-title">Android Camera踩坑详解</h2>
+      </a>
+      <div class="post-abstract">
+        
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2017-12-12</span>
+        
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://hakuless.github.io//tag/tech">
+                Tech
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://hakuless.github.io//tag/android">
+                Android
+                
+              </a>
+            
+          </span>
+        
+      </div>
+    </div>
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://hakuless.github.io//post/anko-layout">
+        <h2 class="post-title">Anko Layout</h2>
+      </a>
+      <div class="post-abstract">
+        <p><a href="https://github.com/Kotlin/anko/wiki/Anko-Layouts#why-anko-layouts">github说明</a>
 Kotlin支持的一种新的，以DSL方式并通过Kotlin代码组件UI的功能。可以让RD完全抛弃使用xml写layout，节约开发时间，规避许多潜在bug</p>
 
-    </p>
-    <div class="row">
-      <a href="https://hakuless.github.io//post/anko-layout" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2017-11-07</span>
+        
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://hakuless.github.io//tag/gEjrhrmNK">
+                Kotlin
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://hakuless.github.io//tag/tech">
+                Tech
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://hakuless.github.io//tag/android">
+                Android
+                
+              </a>
+            
+          </span>
+        
+      </div>
     </div>
-  </article>
+    
+  </section>
 
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://hakuless.github.io//post/freeline-da-bao-liu-cheng-chu-tan">Freeline打包流程初探</a>
-    </h2>
-    <p class="article-meta">
-      2017-05-11
-      
-        <a href="https://hakuless.github.io//tag/tech" class="badge secondary">
-          Tech
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/android" class="badge success">
-          Android
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      <p>点评、美团的Android App两者在业内都是巨量级的大小，对于开发来说编译耗时过长十分影响开发效率，在表层所能做的工作比较有限（module转为aar），节省仍有瓶颈。然而在使用Freeline的增量编译后，已经爱不释手，对开发效率有极大的提升，因此深入了解下其详细实现并对大家分享（安利）一下~</p>
-
-    </p>
-    <div class="row">
-      <a href="https://hakuless.github.io//post/freeline-da-bao-liu-cheng-chu-tan" class="readmore-link">
-        <button>
-          Read More
-        </button>
+<section class="post-item">
+    <div class="content">
+      <a href="https://hakuless.github.io//post/freeline-da-bao-liu-cheng-chu-tan">
+        <h2 class="post-title">Freeline打包流程初探</h2>
       </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://hakuless.github.io//post/android-leng-men-kai-fa-zhi-widget-kai-fa">Android冷门开发之 Widget 开发</a>
-    </h2>
-    <p class="article-meta">
-      2016-12-28
-      
-        <a href="https://hakuless.github.io//tag/tech" class="badge secondary">
-          Tech
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/android" class="badge secondary">
-          Android
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      <p>桌面插件，作为Android开发中很有意思的一部分，但是在平常的业务开发中很少接触。本篇wiki给大家做个基础的普及，并通过内部交流app完成基本功能，让大家对widget内容实现代码有一定的了解。</p>
-
-    </p>
-    <div class="row">
-      <a href="https://hakuless.github.io//post/android-leng-men-kai-fa-zhi-widget-kai-fa" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu">BiliBili Android第三方——第2步</a>
-    </h2>
-    <p class="article-meta">
-      2016-03-23
-      
-        <a href="https://hakuless.github.io//tag/tech" class="badge warning">
-          Tech
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="badge secondary">
-          Life
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-1-bu">BiliBili Android第三方——第1步</a>
-    </h2>
-    <p class="article-meta">
-      2016-02-06
-      
-        <a href="https://hakuless.github.io//tag/tech" class="badge warning">
-          Tech
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/android" class="badge ">
-          Android
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-1-bu" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-0-bu">BiliBili Android第三方——第0步</a>
-    </h2>
-    <p class="article-meta">
-      2016-01-21
-      
-        <a href="https://hakuless.github.io//tag/tech" class="badge success">
-          Tech
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/android" class="badge secondary">
-          Android
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      <p>该项目的原因稍后再写，想开发BiliBili的Android第三方客户端总会有几个必须要跨过的坎，我们第0步主要就是为了这些而做的准备。</p>
-
-    </p>
-    <div class="row">
-      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-0-bu" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-
-        </div>
-        <div class="row flex-edges">
-  
-  
-</div>
+      <div class="post-abstract">
+        <p>点评、美团的Android App两者在业内都是巨量级的大小，对于开发来说编译耗时过长十分影响开发效率，在表层所能做的工作比较有限（module转为aar），节省仍有瓶颈。然而在使用Freeline的增量编译后，已经爱不释手，对开发效率有极大的提升，因此深入了解下其详细实现并对大家分享（安利）一下~</p>
 
       </div>
-      <div class="sm-12 md-4 col sidebar">
-  <div class="paper info-container">
-    <img src="https://hakuless.github.io//images/avatar.png?v=1557322930878" class="no-responsive avatar">
-    <div class="text-muted">温故而知新</div>
-    <div class="social-container">
-      
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2017-05-11</span>
         
-      
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://hakuless.github.io//tag/tech">
+                Tech
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://hakuless.github.io//tag/android">
+                Android
+                
+              </a>
+            
+          </span>
         
-      
-        
-      
-        
-      
-        
-      
+      </div>
     </div>
-  </div>
-  <div class="paper">
-    <div class="sidebar-title">
-      最新文章
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://hakuless.github.io//post/android-leng-men-kai-fa-zhi-widget-kai-fa">
+        <h2 class="post-title">Android冷门开发之 Widget 开发</h2>
+      </a>
+      <div class="post-abstract">
+        <p>桌面插件，作为Android开发中很有意思的一部分，但是在平常的业务开发中很少接触。本篇wiki给大家做个基础的普及，并通过内部交流app完成基本功能，让大家对widget内容实现代码有一定的了解。</p>
+
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2016-12-28</span>
+        
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://hakuless.github.io//tag/tech">
+                Tech
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://hakuless.github.io//tag/android">
+                Android
+                
+              </a>
+            
+          </span>
+        
+      </div>
     </div>
-    <div class="row">
-      <ul>
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu">
+        <h2 class="post-title">BiliBili Android第三方——第2步</h2>
+      </a>
+      <div class="post-abstract">
         
-          
-            <li>
-              <a href="https://hakuless.github.io//post/arraylistsort-cai-keng-zhi-lu">ArrayList.sort踩坑之旅</a>
-            </li>
-          
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2016-03-23</span>
         
-          
-            <li>
-              <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">2017年终总结</a>
-            </li>
-          
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://hakuless.github.io//tag/tech">
+                Tech
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://hakuless.github.io//tag/nR3LVeaXe">
+                Life
+                
+              </a>
+            
+          </span>
         
-          
-            <li>
-              <a href="https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie">Android Camera踩坑详解</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/anko-layout">Anko Layout</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/freeline-da-bao-liu-cheng-chu-tan">Freeline打包流程初探</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/android-leng-men-kai-fa-zhi-widget-kai-fa">Android冷门开发之 Widget 开发</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/dong-man-tui-jian-lesslessjun-noming-ha-greatergreater">动漫推荐 《君の名は。》</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu">BiliBili Android第三方——第2步</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-1-bu">BiliBili Android第三方——第1步</a>
-            </li>
-          
-        
-          
-            <li>
-              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-0-bu">BiliBili Android第三方——第0步</a>
-            </li>
-          
-        
-      </ul>
+      </div>
     </div>
-  </div>
-  <div class="paper">
-    <div class="sidebar-title">
-      标签列表
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-1-bu">
+        <h2 class="post-title">BiliBili Android第三方——第1步</h2>
+      </a>
+      <div class="post-abstract">
+        
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2016-02-06</span>
+        
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://hakuless.github.io//tag/tech">
+                Tech
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://hakuless.github.io//tag/android">
+                Android
+                
+              </a>
+            
+          </span>
+        
+      </div>
     </div>
-    <div class="row">
-      
-        <a href="https://hakuless.github.io//tag/tech" class="badge secondary">
-          Tech
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/android" class="badge success">
-          Android
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="badge success">
-          Life
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/gEjrhrmNK" class="badge success">
-          Kotlin
-        </a>
-      
-        <a href="https://hakuless.github.io//tag/6MiN8T9uX" class="badge secondary">
-          Anima
-        </a>
-      
+    
+  </section>
+
+<section class="post-item">
+    <div class="content">
+      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-0-bu">
+        <h2 class="post-title">BiliBili Android第三方——第0步</h2>
+      </a>
+      <div class="post-abstract">
+        <p>该项目的原因稍后再写，想开发BiliBili的Android第三方客户端总会有几个必须要跨过的坎，我们第0步主要就是为了这些而做的准备。</p>
+
+      </div>
+      <div class="post-info">
+        <span><i class="icon icon-calendar-outline"></i> 2016-01-21</span>
+        
+          <span>
+            <i class="icon icon-pricetags-outline"></i>
+            
+              <a href="https://hakuless.github.io//tag/tech">
+                Tech
+                
+                  ，
+                
+              </a>
+            
+              <a href="https://hakuless.github.io//tag/android">
+                Android
+                
+              </a>
+            
+          </span>
+        
+      </div>
     </div>
-  </div>
-  <div class="paper">
-    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
-  </div>
+    
+  </section>
+
+
+<div class="pagination-container">
+  
+  
 </div>
 
+
+      </div>
+
+      <div class="site-footer">
+  <div class="slogan">温故而知新</div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+
     </div>
-
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-
-<script type="application/javascript">
-
-AOS.init();
+    <script type="application/javascript">
 
 hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
 
 </script>
 
