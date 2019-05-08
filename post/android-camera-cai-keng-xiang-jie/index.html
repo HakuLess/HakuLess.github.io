@@ -1,108 +1,101 @@
-
 <!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
+    <meta charset="utf-8" >
 
 <title>Android Camera踩坑详解 | HaKuLess</title>
 <meta name="description" content="温故而知新">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557324755570">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557323464045">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
 
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
 
   </head>
   <body>
-    <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://hakuless.github.io/">
-        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557323464045" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://hakuless.github.io/">
-        <h1 class="site-title">HaKuLess</h1>
-      </a>
-    </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://hakuless.github.io/">HaKuLess</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
     </div>
   </div>
-</div>
+</nav>
 
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
-      
-        
-          <a href="/" class="menu purple-link">
-            首页
-          </a>
-        
-      
-        
-          <a href="/archives" class="menu purple-link">
-            归档
-          </a>
-        
-      
-        
-          <a href="/tags" class="menu purple-link">
-            标签
-          </a>
-        
-      
-        
-          <a href="/post/about" class="menu purple-link">
-            关于
-          </a>
-        
-      
-    </div>
-  </div>
-</transition>
-
-
-      <div class="content-container">
-        <div class="post-detail">
-          
-          <h2 class="post-title">Android Camera踩坑详解</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2017-12-12</span>
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Android Camera踩坑详解</h1>
+            <p class="article-meta">
+              2017-12-12
+              
+                <a href="https://hakuless.github.io//tag/tech" class="badge ">
+                  Tech
+                </a>
+              
+                <a href="https://hakuless.github.io//tag/android" class="badge success">
+                  Android
+                </a>
+              
+            </p>
             
-              <span>
-                <i class="icon-pricetags-outline"></i>
-                
-                  <a href="https://hakuless.github.io//tag/tech">
-                    Tech
-                    
-                      ，
-                    
-                  </a>
-                
-                  <a href="https://hakuless.github.io//tag/android">
-                    Android
-                    
-                  </a>
-                
-              </span>
-            
-          </div>
-          <div class="post-content">
-            <h2 id="前言">前言</h2>
+            <div class="post-content">
+              <h2 id="前言">前言</h2>
 <p>首先，本文主要以 <strong>android.hardware.Camera</strong> 包来叙述内容，其实Google官方已经把其作为Deprecated的了，但由于新的包 **android.hardware.camera2 **需要最低API level 21，即需要Android 5.0以上，且国内很多厂商对这个接口的支持并不好，因此暂不考虑（主要内容其实变化不大）
 有兴趣的同学，可以看 <a href="https://github.com/google/cameraview">https://github.com/google/cameraview</a> ，Google提供的一个CameraView，可以自动判断使用哪个API~</p>
 <h2 id="开发流程">开发流程</h2>
@@ -278,52 +271,157 @@ parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 <p>至此，本文说了许多开发拍照相关功能会踩到的坑。其实本期翻译的业务需求开发还涉及到很多其他内容，如jpg格式图片压缩、方向感应、动画等，但与拍照相关的共性不是很多，以后其他人开发很难会遇到，也就不说了...</p>
 <p>还是多开发这种需求，才能体会到所谓的Android碎片化，一个屏幕分辨率适配还是无法体现出我大Android碎片的恶心程度的！</p>
 
-          </div>
+            </div>
+          </article>
         </div>
-
-        
-          <div class="next-post">
-            <a class="purple-link" href="https://hakuless.github.io//post/anko-layout">
-              <h3 class="post-title">
-                下一篇：Anko Layout
-              </h3>
-            </a>
-          </div>
+        <div class="paper" data-aos="fade-in">
           
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://hakuless.github.io//post/anko-layout">
+                <h3 class="post-title">
+                  Anko Layout
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
       </div>
 
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://hakuless.github.io//images/avatar.png?v=1557324755570" class="no-responsive avatar">
+    <div class="text-muted">温故而知新</div>
+    <div class="social-container">
       
-
-      <div class="site-footer">
-  <div class="slogan">温故而知新</div>
-  <div class="social-container">
-    
+        
       
-    
+        
       
-    
+        
       
-    
+        
       
-    
+        
       
-    
+    </div>
   </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/arraylistsort-cai-keng-zhi-lu">ArrayList.sort踩坑之旅</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">2017年终总结</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie">Android Camera踩坑详解</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/anko-layout">Anko Layout</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/freeline-da-bao-liu-cheng-chu-tan">Freeline打包流程初探</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/android-leng-men-kai-fa-zhi-widget-kai-fa">Android冷门开发之 Widget 开发</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/dong-man-tui-jian-lesslessjun-noming-ha-greatergreater">动漫推荐 《君の名は。》</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu">BiliBili Android第三方——第2步</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-1-bu">BiliBili Android第三方——第1步</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-0-bu">BiliBili Android第三方——第0步</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://hakuless.github.io//tag/tech" class="badge secondary">
+          Tech
+        </a>
+      
+        <a href="https://hakuless.github.io//tag/android" class="badge success">
+          Android
+        </a>
+      
+        <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="badge secondary">
+          Life
+        </a>
+      
+        <a href="https://hakuless.github.io//tag/gEjrhrmNK" class="badge warning">
+          Kotlin
+        </a>
+      
+        <a href="https://hakuless.github.io//tag/6MiN8T9uX" class="badge secondary">
+          Anima
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  </div>
 </div>
 
 
     </div>
-    <script type="application/javascript">
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
 
 hljs.initHighlightingOnLoad()
-
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
 
 </script>
 

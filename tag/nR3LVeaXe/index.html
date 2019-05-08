@@ -1,223 +1,305 @@
-
 <!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
+    <meta charset="utf-8" >
 
 <title>Life | HaKuLess</title>
 <meta name="description" content="温故而知新">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557324755570">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557323464045">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
 
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
 
   </head>
   <body>
-    <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://hakuless.github.io/">
-        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557323464045" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://hakuless.github.io/">
-        <h1 class="site-title">HaKuLess</h1>
-      </a>
-    </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://hakuless.github.io/">HaKuLess</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
     </div>
   </div>
-</div>
+</nav>
 
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <h2 class="current-tag">标签: Life</h2>
+          
+  <article class="article">
+    <h2 class="article-title">
+      <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">2017年终总结</a>
+    </h2>
+    <p class="article-meta">
+      2018-02-13
       
-        
-          <a href="/" class="menu purple-link">
-            首页
-          </a>
-        
+        <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="badge warning">
+          Life
+        </a>
       
-        
-          <a href="/archives" class="menu purple-link">
-            归档
-          </a>
-        
-      
-        
-          <a href="/tags" class="menu purple-link">
-            标签
-          </a>
-        
-      
-        
-          <a href="/post/about" class="menu purple-link">
-            关于
-          </a>
-        
-      
+    </p>
+    <p class="text-lead">
+      <p>2017算是毕业之后过的最Happy的一年了，没有别的原因，就是终于有点小钱了..</p>
+
+    </p>
+    <div class="row">
+      <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie" class="readmore-link">
+        <button>
+          Read More
+        </button>
+      </a>
     </div>
-  </div>
-</transition>
+  </article>
+
+  <article class="article">
+    <h2 class="article-title">
+      <a href="https://hakuless.github.io//post/dong-man-tui-jian-lesslessjun-noming-ha-greatergreater">动漫推荐 《君の名は。》</a>
+    </h2>
+    <p class="article-meta">
+      2016-12-13
+      
+        <a href="https://hakuless.github.io//tag/6MiN8T9uX" class="badge warning">
+          Anima
+        </a>
+      
+        <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="badge ">
+          Life
+        </a>
+      
+    </p>
+    <p class="text-lead">
+      <p>《你的名字。》（汉译）终于在大陆上映了，之前忍了好几个月不在D站上看盗版是值得的！原本打算去上海长风公园旁边的华谊兄弟看的，没想到B站做活动，vip3以上可以抢（领）免费的电影票（虽然只能万达），很轻松的拿到了票~ O(∩_∩)O~~</p>
+
+    </p>
+    <div class="row">
+      <a href="https://hakuless.github.io//post/dong-man-tui-jian-lesslessjun-noming-ha-greatergreater" class="readmore-link">
+        <button>
+          Read More
+        </button>
+      </a>
+    </div>
+  </article>
+
+  <article class="article">
+    <h2 class="article-title">
+      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu">BiliBili Android第三方——第2步</a>
+    </h2>
+    <p class="article-meta">
+      2016-03-23
+      
+        <a href="https://hakuless.github.io//tag/tech" class="badge warning">
+          Tech
+        </a>
+      
+        <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="badge success">
+          Life
+        </a>
+      
+    </p>
+    <p class="text-lead">
+      
+    </p>
+    <div class="row">
+      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu" class="readmore-link">
+        <button>
+          Read More
+        </button>
+      </a>
+    </div>
+  </article>
 
 
-      <div class="content-container">
-
-        <div class="current-tag-container">
-          <h2 class="title">
-            <i class="icon icon-pricetags-outline"></i> Life
-          </h2> 
         </div>
-
-        
-<section class="post-item">
-    <div class="content">
-      <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">
-        <h2 class="post-title">2017年终总结</h2>
-      </a>
-      <div class="post-abstract">
-        <p>2017算是毕业之后过的最Happy的一年了，没有别的原因，就是终于有点小钱了..</p>
-
-      </div>
-      <div class="post-info">
-        <span><i class="icon icon-calendar-outline"></i> 2018-02-13</span>
-        
-          <span>
-            <i class="icon icon-pricetags-outline"></i>
-            
-              <a href="https://hakuless.github.io//tag/nR3LVeaXe">
-                Life
-                
-              </a>
-            
-          </span>
-        
-      </div>
-    </div>
-    
-  </section>
-
-<section class="post-item">
-    <div class="content">
-      <a href="https://hakuless.github.io//post/dong-man-tui-jian-lesslessjun-noming-ha-greatergreater">
-        <h2 class="post-title">动漫推荐 《君の名は。》</h2>
-      </a>
-      <div class="post-abstract">
-        <p>《你的名字。》（汉译）终于在大陆上映了，之前忍了好几个月不在D站上看盗版是值得的！原本打算去上海长风公园旁边的华谊兄弟看的，没想到B站做活动，vip3以上可以抢（领）免费的电影票（虽然只能万达），很轻松的拿到了票~ O(∩_∩)O~~</p>
-
-      </div>
-      <div class="post-info">
-        <span><i class="icon icon-calendar-outline"></i> 2016-12-13</span>
-        
-          <span>
-            <i class="icon icon-pricetags-outline"></i>
-            
-              <a href="https://hakuless.github.io//tag/6MiN8T9uX">
-                Anima
-                
-                  ，
-                
-              </a>
-            
-              <a href="https://hakuless.github.io//tag/nR3LVeaXe">
-                Life
-                
-              </a>
-            
-          </span>
-        
-      </div>
-    </div>
-    
-  </section>
-
-<section class="post-item">
-    <div class="content">
-      <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu">
-        <h2 class="post-title">BiliBili Android第三方——第2步</h2>
-      </a>
-      <div class="post-abstract">
-        
-      </div>
-      <div class="post-info">
-        <span><i class="icon icon-calendar-outline"></i> 2016-03-23</span>
-        
-          <span>
-            <i class="icon icon-pricetags-outline"></i>
-            
-              <a href="https://hakuless.github.io//tag/tech">
-                Tech
-                
-                  ，
-                
-              </a>
-            
-              <a href="https://hakuless.github.io//tag/nR3LVeaXe">
-                Life
-                
-              </a>
-            
-          </span>
-        
-      </div>
-    </div>
-    
-  </section>
-
-
-<div class="pagination-container">
+        <div class="row flex-edges">
   
   
 </div>
 
-
       </div>
-
-      <div class="site-footer">
-  <div class="slogan">温故而知新</div>
-  <div class="social-container">
-    
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://hakuless.github.io//images/avatar.png?v=1557324755570" class="no-responsive avatar">
+    <div class="text-muted">温故而知新</div>
+    <div class="social-container">
       
-    
+        
       
-    
+        
       
-    
+        
       
-    
+        
       
-    
+        
+      
+    </div>
   </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/arraylistsort-cai-keng-zhi-lu">ArrayList.sort踩坑之旅</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">2017年终总结</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie">Android Camera踩坑详解</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/anko-layout">Anko Layout</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/freeline-da-bao-liu-cheng-chu-tan">Freeline打包流程初探</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/android-leng-men-kai-fa-zhi-widget-kai-fa">Android冷门开发之 Widget 开发</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/dong-man-tui-jian-lesslessjun-noming-ha-greatergreater">动漫推荐 《君の名は。》</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-2-bu">BiliBili Android第三方——第2步</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-1-bu">BiliBili Android第三方——第1步</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-0-bu">BiliBili Android第三方——第0步</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://hakuless.github.io//tag/tech" class="badge warning">
+          Tech
+        </a>
+      
+        <a href="https://hakuless.github.io//tag/android" class="badge ">
+          Android
+        </a>
+      
+        <a href="https://hakuless.github.io//tag/nR3LVeaXe" class="badge success">
+          Life
+        </a>
+      
+        <a href="https://hakuless.github.io//tag/gEjrhrmNK" class="badge secondary">
+          Kotlin
+        </a>
+      
+        <a href="https://hakuless.github.io//tag/6MiN8T9uX" class="badge success">
+          Anima
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  </div>
 </div>
 
-
     </div>
-    <script type="application/javascript">
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
 
 hljs.initHighlightingOnLoad()
-
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
 
 </script>
 
