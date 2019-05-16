@@ -1,0 +1,371 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>CSS初级学习 | HaKuLess</title>
+<meta name="description" content="精神病人思路广，脑残儿童欢乐多">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1557989567258">
+<link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://hakuless.github.io/">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1557989567258" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://hakuless.github.io/">
+        <h1 class="site-title">HaKuLess</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="menu purple-link">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">CSS初级学习</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2019-05-16</span>
+            
+          </div>
+          <div class="post-content">
+            <p>学习一下CSS，前端要是连设计稿都无法实现，基本需求都满足不了~</p>
+<!-- more -->
+<h2 id="css语法">CSS语法</h2>
+<h3 id="基本规则">基本规则</h3>
+<p>CSS主要由两部分组成：选择器(selector) &amp; 声明(declarations)</p>
+<pre><code>/* selector {property: value} */
+h1 {color:red; font-size:14px;}
+</code></pre>
+<p><img src="https://hakuless.github.io//post-images/1557976004501.png" alt=""></p>
+<h3 id="样式表书写">样式表书写</h3>
+<p>目前，主要采用内联样式表的书写方案</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  	&lt;h1 style=&quot;color:red; font-size:14px;&quot;&gt;&lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h3 id="规则">@规则</h3>
+<p>通过@开头，后接标识符
+目前用的比较多的是 @keyframes，通过定义关键帧实现动画效果</p>
+<pre><code>/* @keyframes */
+@keyframes slidein {
+    from {
+        margin-left: 100%;
+        width: 300%;
+    }
+
+    to {
+        margin-left: 0%;
+        width: 100%;
+    }
+}
+</code></pre>
+<h2 id="css工作流程">CSS工作流程</h2>
+<h3 id="页面渲染机制">页面渲染机制</h3>
+<p>页面渲染主要以下5个步骤：</p>
+<ol>
+<li>处理HTML来创建DOM tree；</li>
+<li>处理CSS来创建CSSOM tree；</li>
+<li>根据DOM跟CSSOM来合并render tree；</li>
+<li>根据render tree来布局；</li>
+<li>绘制render tree。</li>
+</ol>
+<h3 id="css的工作流程">CSS的工作流程</h3>
+<p><img src="https://hakuless.github.io//post-images/1557976033477.png" alt="">
+<strong>重排</strong> 与 <strong>重绘</strong></p>
+<h2 id="css逻辑属性">CSS逻辑属性</h2>
+<h3 id="新旧逻辑属性对比">新旧逻辑属性对比</h3>
+<p><img src="https://hakuless.github.io//post-images/1557976478759.png" alt="">
+新旧逻辑对比图表如下：</p>
+<table>
+<thead>
+<tr>
+<th>旧的逻辑属性</th>
+<th>新的逻辑属性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>margin-top</td>
+<td>margin-block-start</td>
+</tr>
+<tr>
+<td>margin-right</td>
+<td>margin-inline-end</td>
+</tr>
+<tr>
+<td>margin-bottom</td>
+<td>margin-block-end</td>
+</tr>
+<tr>
+<td>margin-left</td>
+<td>margin-inline-start</td>
+</tr>
+<tr>
+<td>border-top</td>
+<td>border-block-start</td>
+</tr>
+<tr>
+<td>border-right</td>
+<td>border-inline-end</td>
+</tr>
+<tr>
+<td>border-bottom</td>
+<td>border-block-end</td>
+</tr>
+<tr>
+<td>border-left</td>
+<td>border-inline-start</td>
+</tr>
+<tr>
+<td>padding-top</td>
+<td>padding-block-start</td>
+</tr>
+<tr>
+<td>padding-right</td>
+<td>padding-inline-end</td>
+</tr>
+<tr>
+<td>padding-bottom</td>
+<td>padding-block-end</td>
+</tr>
+<tr>
+<td>padding-left</td>
+<td>padding-inline-start</td>
+</tr>
+<tr>
+<td>width</td>
+<td>inline-size</td>
+</tr>
+<tr>
+<td>height</td>
+<td>block-size</td>
+</tr>
+</tbody>
+</table>
+<p>Y轴方向属性使用 <strong>block</strong>，X轴方向属性使用 <strong>inline</strong></p>
+<h3 id="css定位">CSS定位</h3>
+<table>
+<thead>
+<tr>
+<th>旧的逻辑属性</th>
+<th>新的逻辑属性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>top</td>
+<td>inset-block-start</td>
+</tr>
+<tr>
+<td>bottom</td>
+<td>inset-block-end</td>
+</tr>
+<tr>
+<td>left</td>
+<td>inset-inline-start</td>
+</tr>
+<tr>
+<td>right</td>
+<td>inset-inline-end</td>
+</tr>
+</tbody>
+</table>
+<pre><code>/* 旧的逻辑属性 */
+.popup{
+  position:fixed;  
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+}
+/* 新的逻辑属性 */
+.popup{
+   position:fixed;
+   inset-block-start:0;  /*top - in English*/
+   inset-block-end:0;    /*bottom - in English*/
+   inset-inline-start:0; /*left - in English*/
+   inset-inline-end:0;   /*right - in English*/
+}
+/* 新的逻辑属性支持简写 */
+.popup{
+   position:fixed;
+   inset:0 0 0 0;   /*top, right, bottom, left - in English*/
+}
+</code></pre>
+<p><img src="https://hakuless.github.io//post-images/1557977057594.png" alt="">
+<img src="https://hakuless.github.io//post-images/1557977069217.png" alt=""></p>
+<h2 id="css盒子模型">CSS盒子模型</h2>
+<p>待补充</p>
+<h2 id="css选择器">CSS选择器</h2>
+<h3 id="基本选择器">基本选择器</h3>
+<ol>
+<li>类型选择器： 直接html标签，如 html {width: 100%;}</li>
+<li>类选择器：html标签中class属性的值，如 .div {width: 100%;}</li>
+<li>ID选择器：现在不咋用了，通过html标签的ID属性来选择</li>
+<li>通用选择器：更不会用... 所有标签生效...</li>
+<li>属性选择器：根据html标签里的属性选择？？？</li>
+</ol>
+<h3 id="组合选择器">组合选择器</h3>
+<ol>
+<li>空格：后代选择器，<strong>.a .b</strong> 所有后代都生效</li>
+<li>
+<blockquote>
+<p>：子代选择器，<strong>.a &gt; .b</strong> 只在一级儿子生效</p>
+</blockquote>
+</li>
+<li>~：后继选择器，<strong>.a ~ .b</strong> 弟弟选择器，哥哥不生效</li>
+<li>+：直接后继选择器，<strong>.a + .b</strong> 能生效的第一个弟弟生效</li>
+<li>|：命名空间选择器，<strong>.a | .b</strong> 与后代类似</li>
+<li>||：列表选择器，直接无视，这辈子都不会用的</li>
+</ol>
+<h3 id="伪类-与-伪元素">伪类 与 伪元素</h3>
+<p><strong>伪类</strong>：伪类是添加到选择器的关键字，指定要选择的元素的特殊状态，如 a:hover，鼠标悬停状态的效果</p>
+<pre><code>// 语法
+selector:pseudo-class {
+  property: value;
+}
+</code></pre>
+<p><strong>伪元素</strong>：伪元素是一个附加至选择器末的关键词，允许你对被选择元素的特定部分修改样式。一个选择器中只能使用一个伪元素，如 a::after { content: &quot;→&quot;; } 在所有a类型后增加一个箭头元素</p>
+<pre><code>// 语法
+selector::pseudo-element {
+  property: value;
+}
+</code></pre>
+<h3 id="css函数">CSS函数</h3>
+<ul>
+<li>属性函数：attr()；</li>
+<li>背景图片函数：linear-gradient()、radial-gradient()、conic-gradient()、repeating-linear-gradient()、repeating-radial-gradient()、repeating-conic-gradient()、image-set()、image()、url()、element()；</li>
+<li>颜色函数：rgb()、rgba()、hsl()、hsla()、hwb()、color-mod()；</li>
+<li>图形函数：circle()、ellipse()、inset()、polygon()、path()</li>
+<li>滤镜函数：blur()、brightness()、contrast()、drop-shadow()、grayscale()、hue-rotate()、invert()、opacity()、saturate()、sepia()；</li>
+<li>转换函数：matrix()、matrix3d()、perspective()、rotate()、rotate3d()、rotateX()、rotateY()、rotateZ()、scale()、scale3d()、scaleX()、scaleY()、scaleZ()、skew()、skewX()、skewY()、translate()、translateX()、translateY()、translateZ()、translate3d()；</li>
+<li>数学函数：calc()、min()、max()、mixmax()、repeat()；</li>
+<li>缓动函数：cubic-bezier()、steps()；</li>
+<li>其他函数：counter()、counters()、toggle()、var()、 symbols()。
+<a href="https://www.w3cplus.com/css/css-functions.html">CSS函数说明</a></li>
+</ul>
+<h2 id="参考资料">参考资料</h2>
+<p><a href="https://krissarea.gitee.io/blog/">鱼头的海上世界</a>
+<a href="https://www.w3.org/TR/?tag=css">CSS W3C标准文档</a>
+<a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS">CSS MDN文档</a></p>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://hakuless.github.io//post/js-yu-fa-xue-xi">
+              <h3 class="post-title">
+                下一篇：JS语法学习
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">精神病人思路广，脑残儿童欢乐多</div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/HakuLess" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>
