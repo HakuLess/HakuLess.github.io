@@ -5,7 +5,7 @@
     
 <meta charset="utf-8" >
 
-<title>LeetCode | HaKuLess</title>
+<title>Stack &amp; DFS | HaKuLess</title>
 <meta name="description" content="精神病人思路广，脑残儿童欢乐多">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -77,126 +77,104 @@
 
 
       <div class="content-container">
-
-        <div class="current-tag-container">
-          <h2 class="title">
-            <i class="icon icon-pricetags-outline"></i> LeetCode
-          </h2> 
-        </div>
-
-        
-<section class="post-item">
-    <div class="content">
-      <a href="https://hakuless.github.io//post/union-find-set">
-        <h2 class="post-title">Union-Find Set</h2>
-      </a>
-      <div class="post-abstract">
-        <h2 id="introduction">Introduction</h2>
-<p>并查集是个很有意思的数据结构，它的主要功能是把不同的元素 分组 并 关联 起来，能够在 O(1) 时间内判断两个元素是否在一组里。关系具有传递性的问题，都可以利用并查集处理。</p>
-
-      </div>
-      <div class="post-info">
-        <span><i class="icon icon-calendar-outline"></i> 2019-05-25</span>
-        
-          <span>
-            <i class="icon icon-pricetags-outline"></i>
+        <div class="post-detail">
+          
+          <h2 class="post-title">Stack &amp; DFS</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2019-02-19</span>
             
-              <a href="https://hakuless.github.io//tag/IljgdPijv">
-                LeetCode
+              <span>
+                <i class="icon-pricetags-outline"></i>
                 
-                  ，
+                  <a href="https://hakuless.github.io//tag/IljgdPijv">
+                    LeetCode
+                    
+                      ，
+                    
+                  </a>
                 
-              </a>
+                  <a href="https://hakuless.github.io//tag/B6a_MNeCC">
+                    Data Structure
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/kXyJVahYw">
+                    Algorithm
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/tech">
+                    Tech
+                    
+                  </a>
+                
+              </span>
             
-              <a href="https://hakuless.github.io//tag/B6a_MNeCC">
-                Data Structure
-                
-                  ，
-                
-              </a>
-            
-              <a href="https://hakuless.github.io//tag/kXyJVahYw">
-                Algorithm
-                
-                  ，
-                
-              </a>
-            
-              <a href="https://hakuless.github.io//tag/tech">
-                Tech
-                
-              </a>
-            
-          </span>
-        
-      </div>
-    </div>
-    
-      <a href="https://hakuless.github.io//post/union-find-set">
-        <div class="feature-container" style="background-image: url('https://hakuless.github.io//post-images/union-find-set.png')">
-        </div>
-      </a>
-    
-  </section>
-
-<section class="post-item">
-    <div class="content">
-      <a href="https://hakuless.github.io//post/stack-and-dfs">
-        <h2 class="post-title">Stack &amp; DFS</h2>
-      </a>
-      <div class="post-abstract">
-        <h3 id="stack-dfs">Stack &amp; DFS</h3>
+          </div>
+          <div class="post-content">
+            <h3 id="stack-dfs">Stack &amp; DFS</h3>
 <p>Similar to BFS, <strong>Depth-First Search</strong> can also be used to find the path from the root node to the target node.</p>
 <p>The first path you found in DFS is not always the shortest path.</p>
+<!-- more -->
+<h3 id="dfs-template-i">DFS - Template I</h3>
+<h4 id="template-recursion">Template - Recursion</h4>
+<pre><code>/*
+ * Return true if there is a path from cur to target.
+ */
+boolean DFS(Node cur, Node target, Set&lt;Node&gt; visited) {
+    return true if cur is target;
+    for (next : each neighbor of cur) {
+        if (next is not in visited) {
+            add next to visted;
+            return true if DFS(next, target, visited) == true;
+        }
+    }
+    return false;
+}
+</code></pre>
+<h3 id="dfs-template-ii">DFS - Template II</h3>
+<p>The advantage of the recursion solution is that it is easier to implement. However, there is a huge disadvantage: if the depth of recursion is too high, youwill suffer from <strong>stack overflow</strong>.  In that case, you might want to use BFS instead or implement DFS using an explicit stack.</p>
+<pre><code>/*
+ * Return true if there is a path from cur to target.
+ */
+boolean DFS(int root, int target) {
+    Set&lt;Node&gt; visited;
+    Stack&lt;Node&gt; stack;
+    add root to stack;
+    while (s is not empty) {
+        Node cur = the top element in stack;
+        remove the cur from the stack;
+        return true if cur is target;
+        for (Node next : the neighbors of cur) {
+            if (next is not in visited) {
+                add next to visited;
+                add next to stack;
+            }
+        }
+    }
+    return false;
+}
+</code></pre>
 
-      </div>
-      <div class="post-info">
-        <span><i class="icon icon-calendar-outline"></i> 2019-02-19</span>
+          </div>
+        </div>
+
         
-          <span>
-            <i class="icon icon-pricetags-outline"></i>
-            
-              <a href="https://hakuless.github.io//tag/IljgdPijv">
-                LeetCode
-                
-                  ，
-                
-              </a>
-            
-              <a href="https://hakuless.github.io//tag/B6a_MNeCC">
-                Data Structure
-                
-                  ，
-                
-              </a>
-            
-              <a href="https://hakuless.github.io//tag/kXyJVahYw">
-                Algorithm
-                
-                  ，
-                
-              </a>
-            
-              <a href="https://hakuless.github.io//tag/tech">
-                Tech
-                
-              </a>
-            
-          </span>
-        
+          <div class="next-post">
+            <a class="purple-link" href="https://hakuless.github.io//post/arraylistsort-cai-keng-zhi-lu">
+              <h3 class="post-title">
+                下一篇：ArrayList.sort踩坑之旅
+              </h3>
+            </a>
+          </div>
+          
       </div>
-    </div>
-    
-  </section>
 
-
-<div class="pagination-container">
-  
-  
-</div>
-
-
-      </div>
+      
 
       <div class="site-footer">
   <div class="slogan">精神病人思路广，脑残儿童欢乐多</div>
