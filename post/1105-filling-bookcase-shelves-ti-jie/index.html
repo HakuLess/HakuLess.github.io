@@ -5,7 +5,7 @@
     
 <meta charset="utf-8" >
 
-<title>JS语法学习 | HaKuLess</title>
+<title>1105. Filling Bookcase Shelves —— 题解 | HaKuLess</title>
 <meta name="description" content="精神病人思路广，脑残儿童欢乐多">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -79,24 +79,90 @@
       <div class="content-container">
         <div class="post-detail">
           
-          <h2 class="post-title">JS语法学习</h2>
+          <h2 class="post-title">1105. Filling Bookcase Shelves —— 题解</h2>
           <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2019-05-09</span>
+            <span><i class="icon-calendar-outline"></i> 2019-07-03</span>
+            
+              <span>
+                <i class="icon-pricetags-outline"></i>
+                
+                  <a href="https://hakuless.github.io//tag/f92VwjICi">
+                    DP
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/IljgdPijv">
+                    LeetCode
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/kXyJVahYw">
+                    Algorithm
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://hakuless.github.io//tag/tech">
+                    Tech
+                    
+                  </a>
+                
+              </span>
             
           </div>
           <div class="post-content">
-            <h2 id="generators">Generators</h2>
-<h2 id="promise">Promise</h2>
-<h2 id="asyncawait">Async/Await</h2>
+            <p>本周状态不错，可惜好几周没有DP的题，一下卡住了...
+https://leetcode.com/problems/filling-bookcase-shelves/</p>
+<!-- more -->
+<h3 id="题目大意">题目大意</h3>
+<p>给出一组书，书有宽、高，架子也有宽度，按照顺序从上向下摆放，问架子至少需要多高才能把书都放完，如下图所示：
+<img src="https://hakuless.github.io//post-images/1562138680833.png" alt="">
+这里需要注意</p>
+<ol>
+<li>书是按顺序放的，所以4、5、6无法放到1的右侧，不属于贪心</li>
+<li>换行策略，如2可以放在1的右侧，但是3就要另起一行，相对占用高度会更大</li>
+</ol>
+<h3 id="题解">题解</h3>
+<p>使用动态规划求解这类 <strong>中间状态</strong> &amp;&amp; <strong>下一个输入</strong> 确定 <strong>下一个状态</strong> 的问题
+本题中，如果没有7的输入，那么高度会是5，而成为6原因是前6个输入的结果
+第7本书可以独立一行，or 与前边连续的n本书一起一行（n从0到6，总体宽度不可以大于架子宽度）
+那么 前6本书的最小高度也可以依照该逻辑求出，即每个状态下的最小高度，最后得出动态方程为</p>
+<pre><code>// n从0取到K-1，直到它们总宽度大于架子宽度
+dp[k] = minOf[dp[k], dp[k-n] + max[height{k-n..k}]]
+</code></pre>
+<p>具体题解代码如下：</p>
+<pre><code class="language-Kotlin">fun minHeightShelves(books: Array&lt;IntArray&gt;, shelf_width: Int): Int {
+		val n = books.size
+		val height = IntArray(n + 1)
+		for (i in 0 until n) {
+				var min = Int.MAX_VALUE
+				var h = 0
+				var w = 0
+				for (j in i downTo 0) {
+						h = maxOf(h, books[j][1])
+						w += books[j][0]
+						if (w &gt; shelf_width) break
+						min = minOf(min, h + height[j])
+				}
+				height[i + 1] = min
+		}
+		return height[n]
+}
+</code></pre>
 
           </div>
         </div>
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://hakuless.github.io//post/stack-and-dfs">
+            <a class="purple-link" href="https://hakuless.github.io//post/union-find-set">
               <h3 class="post-title">
-                下一篇：Stack &amp; DFS
+                下一篇：Union-Find Set
               </h3>
             </a>
           </div>
