@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://hakuless.github.io/</id>
     <title>HaKuLess</title>
-    <updated>2019-07-03T08:18:29.685Z</updated>
+    <updated>2019-07-05T02:39:43.101Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://hakuless.github.io/"/>
     <link rel="self" href="https://hakuless.github.io//atom.xml"/>
@@ -925,6 +925,59 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 ]]></content>
     </entry>
     <entry>
+        <title type="html"><![CDATA[Freeline修改笔记]]></title>
+        <id>https://hakuless.github.io//post/freeline-xiu-gai-bi-ji</id>
+        <link href="https://hakuless.github.io//post/freeline-xiu-gai-bi-ji">
+        </link>
+        <updated>2017-12-25T02:37:58.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="起因">起因</h2>
+<p>美团点评合并后，许多业务线的客户端开发需要在 <strong>大众点评</strong> &amp; <strong>美团</strong>（甚至更多）的App上进行开发，而其中很可能有很多业务是重复的，如果通过copy代码不利于以后的修改，因此许多业务线使用提取子BU的公共业务库来解决该问题。</p>
+<p>目前，因为海外团队需要跨地域（北京、上海）协作共同开发该复用库，且点评、美团的迭代周期也有差异，所以只要通过flavor打有一定差异的代码才能满足自己的迭代不会受到对方的影响。</p>
+<p>而对我来说最蛋疼不过的就是Freeline（0.8.8）不支持子module有falvor，而看到freeline的issue和mr也有人提出相应的问题及代码，所以决定本地开搞一个兼容该情况的<strong>Freeline</strong>！😜</p>
+<h2 id="工作流程">工作流程</h2>
+<h3 id="不支持什么">不支持什么？</h3>
+<p>首先，先让我们看下什么都不做的情况下用Freeline build会有什么问题，执行一下py freeline.py -d，发现编译不过会报错.. 截图如下：
+<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsuqhg299j30vi0d6js4.jpg" alt=""></p>
+<p>详细的看下，会发现是许多资源（可以包括java代码、xml和图片等）找不到，追其原因是flavor是按文件夹打包。比如打dianping渠道，会打包dianping和main文件夹，而meituan则会打meituan和main文件夹，对于这种Freeline的现状就只会打main文件夹... 所以只要flavor文件夹里有必要的内容就build不起来了.. 😂</p>
+<h3 id="如何修改">如何修改？</h3>
+<p>万能的gayhub上有许多大神潜伏者，<a href="https://github.com/alibaba/freeline/pull/857">https://github.com/alibaba/freeline/pull/857</a>，这里就是其中解决的PR，具体详细的解决原因后面再说，现在先说下这个该如何使用。</p>
+<p>目前（2017.12.25），freeline官方还没有合入这个PR，因此无法通过官方的gradle插件解决该问题，那么我们只好自己build自己的freeline插件了！主要分为以下几步，每步都会详细的介绍~</p>
+<ol>
+<li>fork freeline or 直接clone freeline</li>
+<li>修改代码，增加flavor支持</li>
+<li>使用gradlew install使插件build到本地库中</li>
+<li>修改自己项目中引入freeline的插件</li>
+<li>修改初始化后的python代码</li>
+<li>愉快的使用freeline build</li>
+</ol>
+<h4 id="代码修改">代码修改</h4>
+<ul>
+<li>修改groovy代码，具体diff只有一行 <a href="https://github.com/alibaba/freeline/pull/857/files#diff-4">https://github.com/alibaba/freeline/pull/857/files#diff-4</a>，只需要把module的flavor和buildtype传入即可，其余的工作可以直接交给python脚本即可</li>
+<li>而由于我们需要发布到本地的maven库，为防止与freeline官方混淆，可以修改版本号 or 包名，我采用的方案是把版本号改成0.8.9（截至目前还未发布）</li>
+<li>修改版本号一共两部分，1是gradle.porperties中的，2是build.gradle发布中的，如下图所示：
+<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsvgkwshyj30x407iq37.jpg" alt="">
+<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsvh8m0dzj30x40auglw.jpg" alt=""></li>
+</ul>
+<h4 id="本地发布">本地发布</h4>
+<p>修改好代码后，我们需要将gradle插件发布到本地，在freeline工程根目录执行./gradlew install，执行完成后你就会发现你的插件发布在本地maven的仓库中了。对于mac来说路径在~/.m2隐藏文件夹下，并且版本号是你发布的版本号！
+<img src="https://ws1.sinaimg.cn/large/006tNc79gy1fmsvlu520uj30u806qmxf.jpg" alt=""></p>
+<h4 id="修改项目">修改项目</h4>
+<p>这回需要修改咱们自己的工程了~ 首先，如果你的build.gradle下的repositories如果没有mavenLocal请+一下，并且放在第一个，然后将你依赖中的freeline:gradle的版本改成你刚才build的版本（对我来说是0.8.9）</p>
+<p>接下来，与正常直接引入freeline无差异，sync后执行./gradlew initFreeline -Pmirror，我这网不够好，用镜像能快不少... 执行完成后，会自动拉取官方freeline的python代码，你也可以修改gradle插件的下载路径，直接下载你将要修改的python，我是懒得发布... 就直接本地改吧，反正freeline更新频率还是很低的..</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNc79gy1fmsw1hkox5j31ju0r83zq.jpg" alt="">
+在旧版本的项目信息中，modules只会包含name 和 path，而使用本地插件后，则会增加flavor和buildtype这两个属性，如下图所示：
+<img src="https://ws1.sinaimg.cn/large/006tNc79gy1fmsw8aibobj31g20ogwfr.jpg" alt=""></p>
+<p>之后还要修改主工程根目录下freeline文件夹中的<strong>gradle_tools.py</strong>，具体diff参考<a href="https://github.com/alibaba/freeline/pull/857/files#diff-9">https://github.com/alibaba/freeline/pull/857/files#diff-9</a>，将flavor加入打包的资源路径，下面就可以执行python freeline.py -d -f了！</p>
+<p>注意：如果你要修改打包渠道，需要执行一次python freeline.py -f，强制重新写一遍projectInfo，否则默认会用原来的配置进行增量编译。</p>
+<p>在之后，就可以愉快的使用增量编译了，在一些超大App动辄编译一下5~10min都只要20s以内就可以搞定！</p>
+<h3 id="为什么这么修改">为什么这么修改？</h3>
+<p>其实，了解过Freeline源码的同学大概能明白Freeline的核心内容是什么。纯从代码的角度来看可分为python执行部分与gradle插件部分（当然还有自行改写的appt、dx等工具）。</p>
+<p>之前，之所以没支持子module的flavor，主要是因为module资源的路径地址没有增加flavor文件夹，所以通过简单的传参，从gradle插件层 -&gt; python脚本层把flavor传过来即可。</p>
+<h2 id="总结">总结</h2>
+<p>本次算是第一个对gradle插件的开发流程稍有了解，接下来打算从零开发一个插件。开发插件与java开发module的技术栈还是有不少差异的~ 开启新的技能点！（如果可以的话，真想全职去搞Freeline 😁）</p>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[Android Camera踩坑详解]]></title>
         <id>https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie</id>
         <link href="https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie">
@@ -1105,140 +1158,6 @@ parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 <h2 id="总结">总结</h2>
 <p>至此，本文说了许多开发拍照相关功能会踩到的坑。其实本期翻译的业务需求开发还涉及到很多其他内容，如jpg格式图片压缩、方向感应、动画等，但与拍照相关的共性不是很多，以后其他人开发很难会遇到，也就不说了...</p>
 <p>还是多开发这种需求，才能体会到所谓的Android碎片化，一个屏幕分辨率适配还是无法体现出我大Android碎片的恶心程度的！</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Anko Layout]]></title>
-        <id>https://hakuless.github.io//post/anko-layout</id>
-        <link href="https://hakuless.github.io//post/anko-layout">
-        </link>
-        <updated>2017-11-07T13:22:49.000Z</updated>
-        <summary type="html"><![CDATA[<p><a href="https://github.com/Kotlin/anko/wiki/Anko-Layouts#why-anko-layouts">github说明</a>
-Kotlin支持的一种新的，以DSL方式并通过Kotlin代码组件UI的功能。可以让RD完全抛弃使用xml写layout，节约开发时间，规避许多潜在bug</p>
-]]></summary>
-        <content type="html"><![CDATA[<p><a href="https://github.com/Kotlin/anko/wiki/Anko-Layouts#why-anko-layouts">github说明</a>
-Kotlin支持的一种新的，以DSL方式并通过Kotlin代码组件UI的功能。可以让RD完全抛弃使用xml写layout，节约开发时间，规避许多潜在bug</p>
-<!--more-->
-<h3 id="使用demo">使用Demo</h3>
-<p>在Activity or Fragment中的onCreate方法中直接写代码：</p>
-<pre><code class="language-kotlin">scrollView {
-    verticalLayout {
-
-        // 顶部模块
-        val topLayout = linearLayout {
-            backgroundColor = resources.getColor(R.color.black)
-        }.lparams(width = matchParent, height = dip(30))
-
-        textView(&quot;textview&quot;) {
-            textSize = 20f
-            gravity = Gravity.CENTER
-        }.lparams(width = matchParent, height = dip(300))
-
-        recyclerView {
-            val lm = LinearLayoutManager(context)
-            lm.orientation = LinearLayoutManager.HORIZONTAL
-            layoutManager = lm
-
-            adapter = MegamiAdapter()
-        }
-
-        button(&quot;点击&quot;) {
-            onClick {
-                topLayout.setBackgroundColor(resources.getColor(R.color.white))
-            }
-        }
-    }
-}
-
-</code></pre>
-<p>一步一步来看，最外层scrollView表示根布局是个ScrollView，与xml不同，可以省略width &amp; height的填写，默认为wrap_content，整体结构与layout.xml的写法相似，使用DSL方式表示各个View的从属关系。
-每个View的属性赋值可以在三个地方操作：</p>
-<ul>
-<li>layoutParams可以通过最后的lparams方法设置（如width、height、weight &amp; gravity）xml中layout_前缀的属性，包括margin、gravity等</li>
-<li>View的构造函数，如textview 和 button 支持单一String参数的构造函数，会把该参数settext</li>
-<li>View的域内可以调用View的所有方法，如上述recyclerView，可在其内部设置adapter、layoutManager等</li>
-</ul>
-<p>除此之外，DSL方法的返回值即View本身，对于需要持有的View可以通过常量获取内容，如上述topLayout赋值为顶部的linearLayout，可以在底部的button中的点击方法中改变其背景颜色</p>
-<h3 id="优点">优点</h3>
-<ul>
-<li>类型安全不会出现LinearLayout转RelativeLayout之类的低级crash问题</li>
-<li>Null安全不存在findViewById找不到的情况，layout文件与id不匹配，比如被其他aar中的layout覆盖等bug</li>
-<li>节约时间反射解析XML耗费CPU及电池，而且在一些极端情况下，容易发生找不到id的error（如freeline or instantRun）</li>
-<li>与Layout共存个人更喜欢纯净的、全部都使用Anko Layout，但对于历史项目 or 使用DSL方式实现有一定麻烦的，可以允许通过include关键字反射View</li>
-</ul>
-<pre><code class="language-kotlin">include&lt;View&gt;(R.layout.something) {
-    backgroundColor = Color.RED
-}.lparams(width = matchParent) { margin = dip(12) }
-</code></pre>
-<h3 id="缺点">缺点</h3>
-<ul>
-<li>RelativeLayout及一些其他依赖id的Layout与R文件直接增加的 @+id不同，Anko Layout需要自己设置id的值，即人工保证id的唯一性所有需要人来保障的都是不可靠的...</li>
-<li>Preview功能，通过xml写Layout时可以通过AS的Preview功能在无需build的情况下就可以查看布局的效果，并可以通过配合tools来查看填写不同参数时的效果，如文案一行、多行、省略号等然而目前Anko Layout的Preview仅支持Android Studio 2.4+（3.0上不好使...）目前Plugin版本号为Anko Support 0.10.2，Android Studio版本号为Android Studio 3.0 beta7<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fl8cxm27odj30qq0w0weu.jpg" alt=""></li>
-</ul>
-<h2 id="原理">原理</h2>
-<p>首先，通过⌃+⌘+K快捷键可以调用Kotlin Byecode，对于JVM来讲，Kotlin和Java没有区别，甚至二者可以任意的互相转换、调用~
-以一个简单的Demo，让我们一起来探索下通过DSL书写布局的秘密！</p>
-<h3 id="代码准备">代码准备</h3>
-<pre><code class="language-kotlin">inline fun ViewManager.verticalLayout(theme: Int = 0, init: _LinearLayout.() -&gt; Unit): LinearLayout {
-    return ankoView(`$$Anko$Factories$CustomViews`.VERTICAL_LAYOUT_FACTORY, theme, init)
-}
-</code></pre>
-<p>上述代码，verticalLayout方法支持2个参数，其中第一个参数是默认值，第二个参数是一个方法（高阶函数以方法作为参数），方法的输入是一个返回值为空的方法（结合Lambda表达式）
-<strong>init: _LinearLayout.() -&gt; Unit</strong>
-这里是相当于执行_LinearLayout中的空方法，之后在 **{ } **所写的具体View代码相当于执行LinearLayout的相应方法，可看下文一个简单代码示例：</p>
-<pre><code class="language-kotlin">val represents: String.(Int) -&gt; Boolean = { other -&gt; toIntOrNull() == other }
-println(&quot;123&quot;.represents(123)) // true
-</code></pre>
-<h3 id="demo分析">DEMO分析</h3>
-<pre><code class="language-kotlin">class MyActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-        MyActivityUI().setContentView(this)
-    }
-}
-
-class MyActivityUI : AnkoComponent&lt;MyActivity&gt; {
-    override fun createView(ui: AnkoContext&lt;MyActivity&gt;) = ui.apply {
-        verticalLayout {
-            val name = editText()
-            button(&quot;Say Hello&quot;) {
-                onClick { ctx.toast(&quot;Hello, ${name.text}!&quot;) }
-            }
-        }
-    }.view
-}
-</code></pre>
-<p>上述布局很简单，就是一个垂直的LinearLayout中，第一行是一个EditText，第二行是一个Button，并且点击Btn的时候会弹出Toast，其中的内容是用户在editText中输入的数据的一个拼装
-但是这个Layout是如何进入contentView的呢？
-如果正常只通过Java代码来写这个功能的代码，就是自己new一大堆View，然后通过addView一点一点的组进去，Anko Layout是如何模仿这一过程的呢？</p>
-<ul>
-<li>通过⌃+⌘+K快捷键打开Bytecode的面板（代码可读性还是比较低的... 用行内的话就是，观影体验极差）<img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fl8e0r9d8zj31kw0umacd.jpg" alt=""></li>
-<li>通过点击Bytecode面板中的Decompile将其反编译为Java code<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fl8e4w487gj31kw0t677s.jpg" alt="">对于两种DSL使用方法略有不同，一种是直接在onCreate中写DSL代码，另一种是通过一个外部类继承AnkoComponent，并复写其中的createView方法。两种没有本质上的区别，本Demo以第二种来进行说明（算是包括了第一种，只是通过AnkoComponent转了一层，加强Layout的复用功能）</li>
-<li>入口方法为 <strong>MyActivityUI().setContentView(this)</strong> 其中setContentView为AnkoComponent的一个扩展，在内部方法中返回实现的AnkoComponent中createView方法创造的View。而 <strong>ui.apply</strong> 方法使其作用域内部任意调用ui的方法，即我们所写的DSL风格的代码其实一样是一个一个的方法，只是省略掉的调用的实例，使其外貌上看上去像是xml写的layout~</li>
-<li>ui的类型为 <strong>interface AnkoContext<out T> : ViewManager</strong> kotlin的interface与java的不同，可以持有变量 并且 方法允许有默认的实现（靠近虚类），其中泛型的in &amp; out也与Java的 T extends 与 super类似，定制所需类型的上界下界，通过in、out方式更直观的通过该类型是输入类型 or 输出类型来判断，更符合人的直观感受🙃通过扩展ViewManager的方法，加入了verticalLayout等一系列Layout的实现，实现了添加View的方法！</li>
-<li>通过ankoView生成相应的View，比如verticalLayout生成LinearLayout在CustomViews.kt文件中，代码如下</li>
-</ul>
-<pre><code>inline fun ViewManager.verticalLayout(theme: Int = 0, init: _LinearLayout.() -&gt; Unit): LinearLayout {
-    return ankoView(`$$Anko$Factories$CustomViews`.VERTICAL_LAYOUT_FACTORY, theme, init)
-}
-</code></pre>
-<ul>
-<li>而ankoView方法中，通过传入的factory来创建view（factory为一个高阶函数，接收context参数返回一个View），并通过AnkoInternals来addView，而internals中的addView即调用ViewGroup or AnkoContext中的addView方法（其实都一样(￣▽￣)&quot;）</li>
-<li>接下来又是一大长串，我还是代码+图片来阐述吧... 这个用文字要打太多了，估计你也看不下去😂AnkoInternals.addView -&gt; createAnkoContext -&gt; AnkoContextImpl -&gt; addView -&gt; doAddView每一个DSL风格的域经过一轮解析创建好View之后并在之后add进其上下文，同时判断其上下文如果是Activity则setContentView作为根节点（对于内部View则是判断ViewManager是ViewGroup or AnkoContext） 通过这种方式实现，普通的onCreate中的直接使用viewGroup &amp; 自定义UI继承AnkoComponent 两种方案。</li>
-</ul>
-<h3 id="整体时序图">整体时序图</h3>
-<p><img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fl8m3hvgraj31h80u03zm.jpg" alt="">
-如上述时序图所示，View的创建一层一层的传递下去，其中共有三种情况，即创建View的三种上下文：</p>
-<ul>
-<li>Activity，在Activity的onCreate中调用，判断到最后通过setContentView来填充整个布局</li>
-<li>Context &amp; Fragment，在其他场景下创建的View，可直接通过UI { } 域生成相应的View</li>
-<li>AnkoContext，在自定义AnkoComponent中的createView方法中定义</li>
-</ul>
-<p>其中第N步开始，即需要根据上下文的不同进入的深度不同，但最终都是返回View（中间可能会进行setContentView操作）</p>
-<h2 id="thanks-to">Thanks To</h2>
-<p><a href="https://github.com/Kotlin/anko/wiki/Anko-Layouts#why-anko-layouts">github说明</a></p>
-<p><a href="http://kotlinlang.org/docs/reference/lambdas.html">Kotlin官方文档</a></p>
-<p><a href="http://www.jianshu.com/p/6dca03569c09">Anko的源码解析</a></p>
 ]]></content>
     </entry>
 </feed>
