@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>1326. Minimum Number of Taps to Open to Water a Garden —— 题解 | HaKuLess</title>
+<meta name="description" content="精神病人思路广，脑残儿童欢乐多">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1580714639752">
+<link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://hakuless.github.io/">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1580714639752" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://hakuless.github.io/">
+        <h1 class="site-title">HaKuLess</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="menu purple-link">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+            <div class="feature-container" style="background-image: url('https://assets.leetcode.com/uploads/2020/01/16/1685_example_1.png')">
+            </div>
+          
+          <h2 class="post-title">1326. Minimum Number of Taps to Open to Water a Garden —— 题解</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2020-02-03</span>
+            
+              <span>
+                <i class="icon-pricetags-outline"></i>
+                
+                  <a href="https://hakuless.github.io/tag/2BbPCaT8e">
+                    Greedy
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://hakuless.github.io/tag/IljgdPijv">
+                    LeetCode
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://hakuless.github.io/tag/kXyJVahYw">
+                    Algorithm
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://hakuless.github.io/tag/gEjrhrmNK">
+                    Kotlin
+                    
+                  </a>
+                
+              </span>
+            
+          </div>
+          <div class="post-content">
+            <p>Contest 172 Q4，作为压轴题题目不算太难，做的时候搞错了点与线段，然后在错误的道路上越走越远...<br>
+附原题链接<a href="https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/">Minimum Number of Taps to Open to Water a Garden</a></p>
+<!-- more -->
+<h3 id="题目描述">题目描述</h3>
+<p>一个一维的线段组成的花园，线段上每个点都有一个水龙头，给出每个水龙头能浇的范围，问最少能用几个水龙头覆盖整个花园。如下图所示：<br>
+<img src="https://hakuless.github.io//post-images/1580714329749.png" alt="" loading="lazy"><br>
+花园范围是[0..5]，给出浇盖范围是[3,4,1,1,0,0]<br>
+水龙头0能覆盖[0..3]<br>
+水龙头1能覆盖[0..5]<br>
+水龙头2能覆盖[1..3]<br>
+水龙头3能覆盖[3..4]</p>
+<ul>
+<li>负数及大于5的数不用考虑</li>
+<li>范围是0则只是一个点，可以直接不看</li>
+</ul>
+<h3 id="题目解析">题目解析</h3>
+<ol>
+<li>覆盖的是范围，因此如果某个水龙头范围是0，则无效（至少要1）</li>
+<li>结果只要求水龙头的数量，对使用哪些不关心，直觉上使用暴力贪心</li>
+<li>数据范围是 1 &lt;= n &lt;= 10^4，复杂度使用O(n²)估计也可以过</li>
+</ol>
+<h3 id="解法一-暴力贪心">解法一 暴力贪心</h3>
+<ol>
+<li>设置p为 当前必须要被浇到的点（即p之前已经被浇到了，从0开始）</li>
+<li>q为覆盖到当前浇到的点的水龙头能到达的最远距离</li>
+<li>每次循环完成，将q赋值给p（注意，这里是需要连续的，即浇【4, 6】后必须要【6, n】而不是【7, n】，因为【6, 7】之间的土地部分，我们浇的不是点而是连续的线段）</li>
+<li>如果p走到了 &gt;= n，代表当前选择的数量已足够覆盖到整个花园，直接return即可</li>
+<li>如果某次循环p == q，代表当前已经没有进步空间了...下一段没有任何水龙头能浇到，因此直接return -1</li>
+<li>时间复杂度为 O(n²)，比较暴力的解法，第二层for循环是从0到n的</li>
+</ol>
+<pre><code class="language-Kotlin">fun minTaps(n: Int, ranges: IntArray): Int {
+    var p = 0
+    var q = 0
+    var res = 0
+    while (p &lt; n) {
+        for (i in 0..n) {
+            if (i - ranges[i] &lt;= p) {
+                q = maxOf(q, i + ranges[i])
+            }
+        }
+        if (p == q) return -1
+        p = q
+        res++
+    }
+    return res
+}
+</code></pre>
+<h3 id="解法二-优化贪心">解法二 优化贪心</h3>
+<ol>
+<li>上面的解法是双层for循环完整遍历，如果对原始数据进行排序，可以只遍历一次</li>
+<li>首先将每个点能覆盖到的范围计算出intervals列表</li>
+<li>按照左侧进行排序，遍历的时候只需要一遍即可</li>
+<li>内部原理与上述相同，cur代表当前必须被浇灌到的点，next为当前覆盖cur的同时能够覆盖最远的点</li>
+<li>时间复杂度 为 O(nlogn)</li>
+</ol>
+<pre><code class="language-Kotlin">fun minTaps(n: Int, ranges: IntArray): Int {
+    val intervals = ArrayList&lt;Pair&lt;Int, Int&gt;&gt;()
+    for (i in 0..n) {
+        intervals.add(Pair(i - ranges[i], i + ranges[i]))
+    }
+    intervals.sortBy { it.first }
+    var ans = 0
+    var cur = 0
+    var next = 0
+    var index = 0
+    while (index &lt;= n) {
+        val it = intervals[index]
+        if (it.first &lt;= cur) {
+            next = maxOf(next, it.second)
+            index++
+            if (next &gt;= n) {
+                return ans + 1
+            }
+        } else {
+            if (next == cur) {
+                return -1
+            }
+            cur = next
+            ans++
+        }
+    }
+    return ans
+}
+</code></pre>
+<h3 id="解法三-再优化贪心">解法三 再优化贪心</h3>
+<p>上述解法因排序而使事件复杂度变成O(nlogn)，那么如果能够不适用排序则可以再次降低时间复杂度到O(n)</p>
+<ol>
+<li>我们来设置一个长度为n+1的数组bounds，bounds[i]代表以i为起点能覆盖到的最远点</li>
+<li>设置初始条件，0必须覆盖
+<ol>
+<li>ans从1开始（即覆盖0）</li>
+<li>当前ans所能覆盖到的最大值cur</li>
+<li>遍历到目前为止可能覆盖到的最大值next</li>
+</ol>
+</li>
+<li>然后遍历1..n
+<ol>
+<li>如果index已经超出可能覆盖的最大值，那么[index-1..index]中的部分是无法被覆盖到的，直接-1</li>
+<li>当index&gt;cur &amp;&amp; index &lt;=next时，需要新开一个水龙头才能覆盖index，并且更新当前最大距离</li>
+<li>不断更新遍历到当前能覆盖到的最大值</li>
+</ol>
+</li>
+<li>可以看出，整个算法事件复杂度为O(n)，巧妙的利用数组存储以每个点为起点能覆盖到的最大值 &amp;&amp; 遍历时不断更新next值，而避免了排序的过程</li>
+</ol>
+<pre><code class="language-Kotlin">fun minTaps(n: Int, ranges: IntArray): Int {
+    val bounds = IntArray(n + 1)
+    ranges.forEachIndexed { index, it -&gt;
+        val left = maxOf(0, index - it)
+        val right = minOf(n, index + it)
+        bounds[left] = right
+    }
+    var ans = 1
+    var cur = bounds[0]
+    var next = bounds[0]
+
+    for (i in 1..n) {
+        if (i &gt; next) return -1
+        if (i &gt; cur) {
+            ans++
+            cur = next
+        }
+        if (bounds[i] &gt; next) {
+            next = bounds[i]
+        }
+    }
+    return ans
+}
+</code></pre>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://hakuless.github.io/post/1114-print-in-order-ti-jie">
+              <h3 class="post-title">
+                下一篇：1114. Print in Order —— 题解
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">精神病人思路广，脑残儿童欢乐多</div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/HakuLess" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

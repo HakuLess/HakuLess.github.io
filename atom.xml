@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://hakuless.github.io/</id>
     <title>HaKuLess</title>
-    <updated>2020-02-03T04:13:13.635Z</updated>
+    <updated>2020-02-03T07:24:37.775Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://hakuless.github.io/"/>
     <link rel="self" href="https://hakuless.github.io/atom.xml"/>
@@ -10,6 +10,145 @@
     <logo>https://hakuless.github.io/images/avatar.png</logo>
     <icon>https://hakuless.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, HaKuLess</rights>
+    <entry>
+        <title type="html"><![CDATA[1326. Minimum Number of Taps to Open to Water a Garden —— 题解]]></title>
+        <id>https://hakuless.github.io/post/1326-minimum-number-of-taps-to-open-to-water-a-garden-ti-jie</id>
+        <link href="https://hakuless.github.io/post/1326-minimum-number-of-taps-to-open-to-water-a-garden-ti-jie">
+        </link>
+        <updated>2020-02-03T06:17:18.000Z</updated>
+        <summary type="html"><![CDATA[<p>Contest 172 Q4，作为压轴题题目不算太难，做的时候搞错了点与线段，然后在错误的道路上越走越远...<br>
+附原题链接<a href="https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/">Minimum Number of Taps to Open to Water a Garden</a></p>
+]]></summary>
+        <content type="html"><![CDATA[<p>Contest 172 Q4，作为压轴题题目不算太难，做的时候搞错了点与线段，然后在错误的道路上越走越远...<br>
+附原题链接<a href="https://leetcode.com/problems/minimum-number-of-taps-to-open-to-water-a-garden/">Minimum Number of Taps to Open to Water a Garden</a></p>
+<!-- more -->
+<h3 id="题目描述">题目描述</h3>
+<p>一个一维的线段组成的花园，线段上每个点都有一个水龙头，给出每个水龙头能浇的范围，问最少能用几个水龙头覆盖整个花园。如下图所示：<br>
+<img src="https://hakuless.github.io//post-images/1580714329749.png" alt="" loading="lazy"><br>
+花园范围是[0..5]，给出浇盖范围是[3,4,1,1,0,0]<br>
+水龙头0能覆盖[0..3]<br>
+水龙头1能覆盖[0..5]<br>
+水龙头2能覆盖[1..3]<br>
+水龙头3能覆盖[3..4]</p>
+<ul>
+<li>负数及大于5的数不用考虑</li>
+<li>范围是0则只是一个点，可以直接不看</li>
+</ul>
+<h3 id="题目解析">题目解析</h3>
+<ol>
+<li>覆盖的是范围，因此如果某个水龙头范围是0，则无效（至少要1）</li>
+<li>结果只要求水龙头的数量，对使用哪些不关心，直觉上使用暴力贪心</li>
+<li>数据范围是 1 &lt;= n &lt;= 10^4，复杂度使用O(n²)估计也可以过</li>
+</ol>
+<h3 id="解法一-暴力贪心">解法一 暴力贪心</h3>
+<ol>
+<li>设置p为 当前必须要被浇到的点（即p之前已经被浇到了，从0开始）</li>
+<li>q为覆盖到当前浇到的点的水龙头能到达的最远距离</li>
+<li>每次循环完成，将q赋值给p（注意，这里是需要连续的，即浇【4, 6】后必须要【6, n】而不是【7, n】，因为【6, 7】之间的土地部分，我们浇的不是点而是连续的线段）</li>
+<li>如果p走到了 &gt;= n，代表当前选择的数量已足够覆盖到整个花园，直接return即可</li>
+<li>如果某次循环p == q，代表当前已经没有进步空间了...下一段没有任何水龙头能浇到，因此直接return -1</li>
+<li>时间复杂度为 O(n²)，比较暴力的解法，第二层for循环是从0到n的</li>
+</ol>
+<pre><code class="language-Kotlin">fun minTaps(n: Int, ranges: IntArray): Int {
+    var p = 0
+    var q = 0
+    var res = 0
+    while (p &lt; n) {
+        for (i in 0..n) {
+            if (i - ranges[i] &lt;= p) {
+                q = maxOf(q, i + ranges[i])
+            }
+        }
+        if (p == q) return -1
+        p = q
+        res++
+    }
+    return res
+}
+</code></pre>
+<h3 id="解法二-优化贪心">解法二 优化贪心</h3>
+<ol>
+<li>上面的解法是双层for循环完整遍历，如果对原始数据进行排序，可以只遍历一次</li>
+<li>首先将每个点能覆盖到的范围计算出intervals列表</li>
+<li>按照左侧进行排序，遍历的时候只需要一遍即可</li>
+<li>内部原理与上述相同，cur代表当前必须被浇灌到的点，next为当前覆盖cur的同时能够覆盖最远的点</li>
+<li>时间复杂度 为 O(nlogn)</li>
+</ol>
+<pre><code class="language-Kotlin">fun minTaps(n: Int, ranges: IntArray): Int {
+    val intervals = ArrayList&lt;Pair&lt;Int, Int&gt;&gt;()
+    for (i in 0..n) {
+        intervals.add(Pair(i - ranges[i], i + ranges[i]))
+    }
+    intervals.sortBy { it.first }
+    var ans = 0
+    var cur = 0
+    var next = 0
+    var index = 0
+    while (index &lt;= n) {
+        val it = intervals[index]
+        if (it.first &lt;= cur) {
+            next = maxOf(next, it.second)
+            index++
+            if (next &gt;= n) {
+                return ans + 1
+            }
+        } else {
+            if (next == cur) {
+                return -1
+            }
+            cur = next
+            ans++
+        }
+    }
+    return ans
+}
+</code></pre>
+<h3 id="解法三-再优化贪心">解法三 再优化贪心</h3>
+<p>上述解法因排序而使事件复杂度变成O(nlogn)，那么如果能够不适用排序则可以再次降低时间复杂度到O(n)</p>
+<ol>
+<li>我们来设置一个长度为n+1的数组bounds，bounds[i]代表以i为起点能覆盖到的最远点</li>
+<li>设置初始条件，0必须覆盖
+<ol>
+<li>ans从1开始（即覆盖0）</li>
+<li>当前ans所能覆盖到的最大值cur</li>
+<li>遍历到目前为止可能覆盖到的最大值next</li>
+</ol>
+</li>
+<li>然后遍历1..n
+<ol>
+<li>如果index已经超出可能覆盖的最大值，那么[index-1..index]中的部分是无法被覆盖到的，直接-1</li>
+<li>当index&gt;cur &amp;&amp; index &lt;=next时，需要新开一个水龙头才能覆盖index，并且更新当前最大距离</li>
+<li>不断更新遍历到当前能覆盖到的最大值</li>
+</ol>
+</li>
+<li>可以看出，整个算法事件复杂度为O(n)，巧妙的利用数组存储以每个点为起点能覆盖到的最大值 &amp;&amp; 遍历时不断更新next值，而避免了排序的过程</li>
+</ol>
+<pre><code class="language-Kotlin">fun minTaps(n: Int, ranges: IntArray): Int {
+    val bounds = IntArray(n + 1)
+    ranges.forEachIndexed { index, it -&gt;
+        val left = maxOf(0, index - it)
+        val right = minOf(n, index + it)
+        bounds[left] = right
+    }
+    var ans = 1
+    var cur = bounds[0]
+    var next = bounds[0]
+
+    for (i in 1..n) {
+        if (i &gt; next) return -1
+        if (i &gt; cur) {
+            ans++
+            cur = next
+        }
+        if (bounds[i] &gt; next) {
+            next = bounds[i]
+        }
+    }
+    return ans
+}
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[1114. Print in Order —— 题解]]></title>
         <id>https://hakuless.github.io/post/1114-print-in-order-ti-jie</id>
@@ -1099,59 +1238,6 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 </ol>
 <p>今天是2018.02.13，明天情人节坐飞机回家... 后天就是大年三十...<br>
 新的一年还是没想找女朋友（也没有不想找！！）</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Freeline修改笔记]]></title>
-        <id>https://hakuless.github.io/post/freeline-xiu-gai-bi-ji</id>
-        <link href="https://hakuless.github.io/post/freeline-xiu-gai-bi-ji">
-        </link>
-        <updated>2017-12-25T02:37:58.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="起因">起因</h2>
-<p>美团点评合并后，许多业务线的客户端开发需要在 <strong>大众点评</strong> &amp; <strong>美团</strong>（甚至更多）的App上进行开发，而其中很可能有很多业务是重复的，如果通过copy代码不利于以后的修改，因此许多业务线使用提取子BU的公共业务库来解决该问题。</p>
-<p>目前，因为海外团队需要跨地域（北京、上海）协作共同开发该复用库，且点评、美团的迭代周期也有差异，所以只要通过flavor打有一定差异的代码才能满足自己的迭代不会受到对方的影响。</p>
-<p>而对我来说最蛋疼不过的就是Freeline（0.8.8）不支持子module有falvor，而看到freeline的issue和mr也有人提出相应的问题及代码，所以决定本地开搞一个兼容该情况的<strong>Freeline</strong>！😜</p>
-<h2 id="工作流程">工作流程</h2>
-<h3 id="不支持什么">不支持什么？</h3>
-<p>首先，先让我们看下什么都不做的情况下用Freeline build会有什么问题，执行一下py freeline.py -d，发现编译不过会报错.. 截图如下：<br>
-<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsuqhg299j30vi0d6js4.jpg" alt="" loading="lazy"></p>
-<p>详细的看下，会发现是许多资源（可以包括java代码、xml和图片等）找不到，追其原因是flavor是按文件夹打包。比如打dianping渠道，会打包dianping和main文件夹，而meituan则会打meituan和main文件夹，对于这种Freeline的现状就只会打main文件夹... 所以只要flavor文件夹里有必要的内容就build不起来了.. 😂</p>
-<h3 id="如何修改">如何修改？</h3>
-<p>万能的gayhub上有许多大神潜伏者，<a href="https://github.com/alibaba/freeline/pull/857">https://github.com/alibaba/freeline/pull/857</a>，这里就是其中解决的PR，具体详细的解决原因后面再说，现在先说下这个该如何使用。</p>
-<p>目前（2017.12.25），freeline官方还没有合入这个PR，因此无法通过官方的gradle插件解决该问题，那么我们只好自己build自己的freeline插件了！主要分为以下几步，每步都会详细的介绍~</p>
-<ol>
-<li>fork freeline or 直接clone freeline</li>
-<li>修改代码，增加flavor支持</li>
-<li>使用gradlew install使插件build到本地库中</li>
-<li>修改自己项目中引入freeline的插件</li>
-<li>修改初始化后的python代码</li>
-<li>愉快的使用freeline build</li>
-</ol>
-<h4 id="代码修改">代码修改</h4>
-<ul>
-<li>修改groovy代码，具体diff只有一行 <a href="https://github.com/alibaba/freeline/pull/857/files#diff-4">https://github.com/alibaba/freeline/pull/857/files#diff-4</a>，只需要把module的flavor和buildtype传入即可，其余的工作可以直接交给python脚本即可</li>
-<li>而由于我们需要发布到本地的maven库，为防止与freeline官方混淆，可以修改版本号 or 包名，我采用的方案是把版本号改成0.8.9（截至目前还未发布）</li>
-<li>修改版本号一共两部分，1是gradle.porperties中的，2是build.gradle发布中的，如下图所示：<br>
-<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsvgkwshyj30x407iq37.jpg" alt="" loading="lazy"><br>
-<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsvh8m0dzj30x40auglw.jpg" alt="" loading="lazy"></li>
-</ul>
-<h4 id="本地发布">本地发布</h4>
-<p>修改好代码后，我们需要将gradle插件发布到本地，在freeline工程根目录执行./gradlew install，执行完成后你就会发现你的插件发布在本地maven的仓库中了。对于mac来说路径在~/.m2隐藏文件夹下，并且版本号是你发布的版本号！<br>
-<img src="https://ws1.sinaimg.cn/large/006tNc79gy1fmsvlu520uj30u806qmxf.jpg" alt="" loading="lazy"></p>
-<h4 id="修改项目">修改项目</h4>
-<p>这回需要修改咱们自己的工程了~ 首先，如果你的build.gradle下的repositories如果没有mavenLocal请+一下，并且放在第一个，然后将你依赖中的freeline:gradle的版本改成你刚才build的版本（对我来说是0.8.9）</p>
-<p>接下来，与正常直接引入freeline无差异，sync后执行./gradlew initFreeline -Pmirror，我这网不够好，用镜像能快不少... 执行完成后，会自动拉取官方freeline的python代码，你也可以修改gradle插件的下载路径，直接下载你将要修改的python，我是懒得发布... 就直接本地改吧，反正freeline更新频率还是很低的..</p>
-<p><img src="https://ws3.sinaimg.cn/large/006tNc79gy1fmsw1hkox5j31ju0r83zq.jpg" alt="" loading="lazy"><br>
-在旧版本的项目信息中，modules只会包含name 和 path，而使用本地插件后，则会增加flavor和buildtype这两个属性，如下图所示：<br>
-<img src="https://ws1.sinaimg.cn/large/006tNc79gy1fmsw8aibobj31g20ogwfr.jpg" alt="" loading="lazy"></p>
-<p>之后还要修改主工程根目录下freeline文件夹中的<strong>gradle_tools.py</strong>，具体diff参考<a href="https://github.com/alibaba/freeline/pull/857/files#diff-9">https://github.com/alibaba/freeline/pull/857/files#diff-9</a>，将flavor加入打包的资源路径，下面就可以执行python freeline.py -d -f了！</p>
-<p>注意：如果你要修改打包渠道，需要执行一次python freeline.py -f，强制重新写一遍projectInfo，否则默认会用原来的配置进行增量编译。</p>
-<p>在之后，就可以愉快的使用增量编译了，在一些超大App动辄编译一下5~10min都只要20s以内就可以搞定！</p>
-<h3 id="为什么这么修改">为什么这么修改？</h3>
-<p>其实，了解过Freeline源码的同学大概能明白Freeline的核心内容是什么。纯从代码的角度来看可分为python执行部分与gradle插件部分（当然还有自行改写的appt、dx等工具）。</p>
-<p>之前，之所以没支持子module的flavor，主要是因为module资源的路径地址没有增加flavor文件夹，所以通过简单的传参，从gradle插件层 -&gt; python脚本层把flavor传过来即可。</p>
-<h2 id="总结">总结</h2>
-<p>本次算是第一个对gradle插件的开发流程稍有了解，接下来打算从零开发一个插件。开发插件与java开发module的技术栈还是有不少差异的~ 开启新的技能点！（如果可以的话，真想全职去搞Freeline 😁）</p>
 ]]></content>
     </entry>
 </feed>
