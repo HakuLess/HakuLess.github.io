@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>1114. Print in Order —— 题解 | HaKuLess</title>
+<meta name="description" content="精神病人思路广，脑残儿童欢乐多">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1580701833955">
+<link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://hakuless.github.io/">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1580701833955" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://hakuless.github.io/">
+        <h1 class="site-title">HaKuLess</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="menu purple-link">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">1114. Print in Order —— 题解</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2020-02-03</span>
+            
+          </div>
+          <div class="post-content">
+            <p>最近工作中终于有些多线程的Case了，玩一玩LeetCode多线程的题目，复习一下知识（N久没有开发过多线程交互的代码了...）</p>
+<!-- more -->
+<h3 id="原题描述">原题描述</h3>
+<p>给定一个如下的类Foo，ABC三个线程分别调用 first、second、third方法，但是无论ABC的调用顺序如何，我们的输出顺序保持着1、2、3</p>
+<pre><code class="language-Kotlin">public class Foo {
+  public void first() { print(&quot;first&quot;); }
+  public void second() { print(&quot;second&quot;); }
+  public void third() { print(&quot;third&quot;); }
+}
+</code></pre>
+<h3 id="变种">变种</h3>
+<p>由于LeetCode上的多线程题目不支持Kotlin代码，因此自己设置主函数 并 稍微改变下题目，方便观察结果<br>
+首先，我们把主函数设置为如下代码：</p>
+<pre><code class="language-Kotlin">fun main(args: Array&lt;String&gt;) {
+    val max = 1000
+    val s = Foo()
+    thread {
+        for (i in 0..max)
+            s.first()
+    }
+    thread {
+        for (i in 0..max)
+            s.second()
+    }
+    thread {
+        for (i in 0..max)
+            s.third()
+    }
+}
+</code></pre>
+<ol>
+<li>共有三个不同线程，每个线程自己会去执行Foo的first、second、third方法各1001次</li>
+<li>我们希望打印first先执行，然后执行second，再执行third(循环反复)</li>
+<li>最终每个打印都1001次，共计3003次</li>
+</ol>
+<h3 id="解法一countdownlatch">解法一：CountDownLatch</h3>
+<ol>
+<li>分别设置三个不同的CountDownLatch，分别拦截first、second、third</li>
+<li>最开始first不用拦截，默认设置c0为0</li>
+<li>执行自己时，将下一道门countDown掉（每个执行都到等待自己的门）</li>
+<li>执行完成自己，重新把自己的门闩设置上（防止重复执行某一个）</li>
+</ol>
+<pre><code class="language-Kotlin">class Foo {
+    private var c0 = CountDownLatch(0)
+    private var c1 = CountDownLatch(1)
+    private var c2 = CountDownLatch(1)
+
+    fun first() {
+        c0.await()
+        println(&quot;first&quot;)
+        c0 = CountDownLatch(1)
+        c1.countDown()
+    }
+
+    fun second() {
+        c1.await()
+        println(&quot;second&quot;)
+        c1 = CountDownLatch(1)
+        c2.countDown()
+    }
+
+    fun third() {
+        c2.await()
+        println(&quot;third&quot;)
+        c2 = CountDownLatch(1)
+        c0.countDown()
+    }
+}
+</code></pre>
+<h3 id="解法二-reentrantlock-with-condition">解法二： ReentrantLock with Condition</h3>
+<ol>
+<li>使用变量cur，代表当前允许执行的方法</li>
+<li>首先在first、second、third中都加入lock()和unlock()，保证每次只会有一个方法执行</li>
+<li>执行时进行变量判断，根据条件执行打印 or condition.wait()</li>
+<li>执行完成后，修改变量cur &amp;&amp; 提示下一个condition可以执行</li>
+</ol>
+<pre><code class="language-Kotlin">class Foo {
+
+    private val lock = ReentrantLock()
+
+    var cur = 1
+    private val c1 = lock.newCondition()
+    private val c2 = lock.newCondition()
+    private val c3 = lock.newCondition()
+
+    fun first() {
+        lock.lock()
+        if (cur != 1) {
+            c1.await()
+        }
+        println(&quot;first&quot;)
+        cur = 2
+        c2.signal()
+        lock.unlock()
+    }
+
+    fun second() {
+        lock.lock()
+        if (cur != 2) {
+            c2.await()
+        }
+        println(&quot;second&quot;)
+        cur = 3
+        c3.signal()
+        lock.unlock()
+    }
+
+    fun third() {
+        lock.lock()
+        if (cur != 3) {
+            c3.await()
+        }
+        println(&quot;third&quot;)
+        cur = 1
+        c1.signal()
+        lock.unlock()
+    }
+}
+</code></pre>
+<h3 id="解法三-object锁-wait-notify">解法三： Object锁 &amp; wait &amp; notify</h3>
+<p>该方法直接利用Object类中的wait方法（由于Kotlin中的Any并没有，因此需要使用as强转一下）停住线程</p>
+<ol>
+<li>通过 @Synchronized 注解使三个方法互斥</li>
+<li>同样设置cur为当前可执行的方法变量</li>
+<li>通过while循环判断是否可执行，不可执行则wait，可执行则执行并notifyAll</li>
+</ol>
+<p>注：</p>
+<ol>
+<li>这里需要用while判断，而非解法二中的if判断，主要是notifyAll会唤醒其他所有的wait，而wait唤醒后是继续执行，如果使用if则有可能条件仍不匹配，但是执行下去，导致与要求不符</li>
+<li>可以看出解法三不如1、2的控制精准，能够唤醒特定线程</li>
+</ol>
+<pre><code class="language-Kotlin">class Foo {
+    var cur = 1
+
+    @Synchronized
+    fun first() {
+        while (cur != 1) {
+            (this as Object).wait()
+        }
+        println(&quot;first&quot;)
+        cur = 2
+        (this as Object).notifyAll()
+    }
+
+    @Synchronized
+    fun second() {
+        while (cur != 2) {
+            (this as Object).wait()
+        }
+        println(&quot;second&quot;)
+        cur = 3
+        (this as Object).notifyAll()
+    }
+
+    @Synchronized
+    fun third() {
+        while (cur != 3) {
+            (this as Object).wait()
+        }
+        println(&quot;third&quot;)
+        cur = 1
+        (this as Object).notifyAll()
+    }
+}
+</code></pre>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://hakuless.github.io/post/1105-filling-bookcase-shelves-ti-jie">
+              <h3 class="post-title">
+                下一篇：1105. Filling Bookcase Shelves —— 题解
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">精神病人思路广，脑残儿童欢乐多</div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/HakuLess" target="_blank">
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

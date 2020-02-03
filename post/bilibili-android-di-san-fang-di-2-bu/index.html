@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1562294380249">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1580701833955">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
@@ -29,7 +29,7 @@
   <div class="site-header">
     <div class="left">
       <a href="https://hakuless.github.io/">
-        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1562294380249" alt="" width="32px" height="32px">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1580701833955" alt="" width="32px" height="32px">
       </a>
       <a href="https://hakuless.github.io/">
         <h1 class="site-title">HaKuLess</h1>
@@ -86,14 +86,14 @@
               <span>
                 <i class="icon-pricetags-outline"></i>
                 
-                  <a href="https://hakuless.github.io//tag/tech">
+                  <a href="https://hakuless.github.io/tag/tech">
                     Tech
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/nR3LVeaXe">
+                  <a href="https://hakuless.github.io/tag/nR3LVeaXe">
                     Life
                     
                   </a>
@@ -134,7 +134,7 @@
 </code></pre>
 <p>房间号23058为B站官方音乐直播间，房间号稳定，可供大家测试。</p>
 <p>将http://live.bilibili.com/api/playurl?player=1&amp;quality=0&amp;cid=23058粘到浏览器中即可，这种xml格式浏览器无法直接解析因此可能看不到内容，需要查看源代码，即可查看到如下图的内容：</p>
-<p>![直播地址xml](https://github.com/HakuLess/ImageLib/blob/master/blog/live_xml.png?raw=true =744x209)</p>
+<figure data-type="image" tabindex="1"><img src="https://github.com/HakuLess/ImageLib/blob/master/blog/live_xml.png?raw=true" alt="直播地址xml" width="744" height="209" loading="lazy"></figure>
 <p>url为默认使用线路，b1、b2、b3指的是备用线路1、2、3。至此，我们获取到了B站直播的播放地址。接下来就可以使用ijkplayer使用该地址进行播放视频。</p>
 <p>点播地址URL与直播地址相似，同样有cid的概念。首先需要通过其他接口获取视频直播地址的cid，然后通过如下接口获取点播视频的地址：</p>
 <pre><code>String sign_this = string2MD5(&quot;appkey=&quot; + appkey + &quot;&amp;cid=&quot; + cid + secretkey);
@@ -194,15 +194,15 @@ http://cn-zjsx10-dx.acgvideo.com/vg2/f/a0/3885454-1.flv?expires=1458561300&amp;s
 播放视频的方式不止一种，这里只提供使用ijkplayer播放视频的方式，需要的同学可以看[ijkplayer github](https://github.com/Bilibili/ijkplayer)。对于我们只使用不修改的同学，可以直接在gradle中配置即可。
 
 </code></pre>
-<p>required
-allprojects {
-repositories {
-jcenter()
-}
+<p>required<br>
+allprojects {<br>
+repositories {<br>
+jcenter()<br>
+}<br>
 }</p>
-<p>dependencies {
-# required, enough for most devices.
-compile 'tv.danmaku.ijk.media:ijkplayer-java:0.4.5.1'
+<p>dependencies {<br>
+# required, enough for most devices.<br>
+compile 'tv.danmaku.ijk.media:ijkplayer-java:0.4.5.1'<br>
 compile 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.4.5.1'</p>
 <pre><code># Other ABIs: optional
 compile 'tv.danmaku.ijk.media:ijkplayer-armv5:0.4.5.1'
@@ -216,12 +216,12 @@ compile 'tv.danmaku.ijk.media:ijkplayer-exo:0.4.5.1'
 <pre><code>对于大部分情况只需要配置required项即可，之后就可以在项目中直接使用ijkMediaPlayer，使用方式与普通的MediaPlayer相似，具体代码如下：
 
 </code></pre>
-<p>private void playVideo(String uri) {
-try {
-ijkMediaPlayer.setDataSource(this, Uri.parse(uri));
-ijkMediaPlayer.setDisplay(holder);
-holder.addCallback(new SurfaceHolder.Callback() {
-@Override
+<p>private void playVideo(String uri) {<br>
+try {<br>
+ijkMediaPlayer.setDataSource(this, Uri.parse(uri));<br>
+ijkMediaPlayer.setDisplay(holder);<br>
+holder.addCallback(new SurfaceHolder.Callback() {<br>
+@Override<br>
 public void surfaceCreated(SurfaceHolder holder) {</p>
 <pre><code>            }
 
@@ -263,7 +263,7 @@ public void surfaceCreated(SurfaceHolder holder) {</p>
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://hakuless.github.io//post/bilibili-android-di-san-fang-di-1-bu">
+            <a class="purple-link" href="https://hakuless.github.io/post/bilibili-android-di-san-fang-di-1-bu">
               <h3 class="post-title">
                 下一篇：BiliBili Android第三方——第1步
               </h3>

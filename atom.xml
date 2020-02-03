@@ -2,38 +2,213 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://hakuless.github.io/</id>
     <title>HaKuLess</title>
-    <updated>2019-07-05T02:39:43.101Z</updated>
+    <updated>2020-02-03T03:50:49.075Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://hakuless.github.io/"/>
-    <link rel="self" href="https://hakuless.github.io//atom.xml"/>
+    <link rel="self" href="https://hakuless.github.io/atom.xml"/>
     <subtitle>精神病人思路广，脑残儿童欢乐多</subtitle>
-    <logo>https://hakuless.github.io//images/avatar.png</logo>
-    <icon>https://hakuless.github.io//favicon.ico</icon>
-    <rights>All rights reserved 2019, HaKuLess</rights>
+    <logo>https://hakuless.github.io/images/avatar.png</logo>
+    <icon>https://hakuless.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2020, HaKuLess</rights>
+    <entry>
+        <title type="html"><![CDATA[1114. Print in Order —— 题解]]></title>
+        <id>https://hakuless.github.io/post/1114-print-in-order-ti-jie</id>
+        <link href="https://hakuless.github.io/post/1114-print-in-order-ti-jie">
+        </link>
+        <updated>2020-02-03T03:32:34.000Z</updated>
+        <summary type="html"><![CDATA[<p>最近工作中终于有些多线程的Case了，玩一玩LeetCode多线程的题目，复习一下知识（N久没有开发过多线程交互的代码了...）</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>最近工作中终于有些多线程的Case了，玩一玩LeetCode多线程的题目，复习一下知识（N久没有开发过多线程交互的代码了...）</p>
+<!-- more -->
+<h3 id="原题描述">原题描述</h3>
+<p>给定一个如下的类Foo，ABC三个线程分别调用 first、second、third方法，但是无论ABC的调用顺序如何，我们的输出顺序保持着1、2、3</p>
+<pre><code class="language-Kotlin">public class Foo {
+  public void first() { print(&quot;first&quot;); }
+  public void second() { print(&quot;second&quot;); }
+  public void third() { print(&quot;third&quot;); }
+}
+</code></pre>
+<h3 id="变种">变种</h3>
+<p>由于LeetCode上的多线程题目不支持Kotlin代码，因此自己设置主函数 并 稍微改变下题目，方便观察结果<br>
+首先，我们把主函数设置为如下代码：</p>
+<pre><code class="language-Kotlin">fun main(args: Array&lt;String&gt;) {
+    val max = 1000
+    val s = Foo()
+    thread {
+        for (i in 0..max)
+            s.first()
+    }
+    thread {
+        for (i in 0..max)
+            s.second()
+    }
+    thread {
+        for (i in 0..max)
+            s.third()
+    }
+}
+</code></pre>
+<ol>
+<li>共有三个不同线程，每个线程自己会去执行Foo的first、second、third方法各1001次</li>
+<li>我们希望打印first先执行，然后执行second，再执行third(循环反复)</li>
+<li>最终每个打印都1001次，共计3003次</li>
+</ol>
+<h3 id="解法一countdownlatch">解法一：CountDownLatch</h3>
+<ol>
+<li>分别设置三个不同的CountDownLatch，分别拦截first、second、third</li>
+<li>最开始first不用拦截，默认设置c0为0</li>
+<li>执行自己时，将下一道门countDown掉（每个执行都到等待自己的门）</li>
+<li>执行完成自己，重新把自己的门闩设置上（防止重复执行某一个）</li>
+</ol>
+<pre><code class="language-Kotlin">class Foo {
+    private var c0 = CountDownLatch(0)
+    private var c1 = CountDownLatch(1)
+    private var c2 = CountDownLatch(1)
+
+    fun first() {
+        c0.await()
+        println(&quot;first&quot;)
+        c0 = CountDownLatch(1)
+        c1.countDown()
+    }
+
+    fun second() {
+        c1.await()
+        println(&quot;second&quot;)
+        c1 = CountDownLatch(1)
+        c2.countDown()
+    }
+
+    fun third() {
+        c2.await()
+        println(&quot;third&quot;)
+        c2 = CountDownLatch(1)
+        c0.countDown()
+    }
+}
+</code></pre>
+<h3 id="解法二-reentrantlock-with-condition">解法二： ReentrantLock with Condition</h3>
+<ol>
+<li>使用变量cur，代表当前允许执行的方法</li>
+<li>首先在first、second、third中都加入lock()和unlock()，保证每次只会有一个方法执行</li>
+<li>执行时进行变量判断，根据条件执行打印 or condition.wait()</li>
+<li>执行完成后，修改变量cur &amp;&amp; 提示下一个condition可以执行</li>
+</ol>
+<pre><code class="language-Kotlin">class Foo {
+
+    private val lock = ReentrantLock()
+
+    var cur = 1
+    private val c1 = lock.newCondition()
+    private val c2 = lock.newCondition()
+    private val c3 = lock.newCondition()
+
+    fun first() {
+        lock.lock()
+        if (cur != 1) {
+            c1.await()
+        }
+        println(&quot;first&quot;)
+        cur = 2
+        c2.signal()
+        lock.unlock()
+    }
+
+    fun second() {
+        lock.lock()
+        if (cur != 2) {
+            c2.await()
+        }
+        println(&quot;second&quot;)
+        cur = 3
+        c3.signal()
+        lock.unlock()
+    }
+
+    fun third() {
+        lock.lock()
+        if (cur != 3) {
+            c3.await()
+        }
+        println(&quot;third&quot;)
+        cur = 1
+        c1.signal()
+        lock.unlock()
+    }
+}
+</code></pre>
+<h3 id="解法三-object锁-wait-notify">解法三： Object锁 &amp; wait &amp; notify</h3>
+<p>该方法直接利用Object类中的wait方法（由于Kotlin中的Any并没有，因此需要使用as强转一下）停住线程</p>
+<ol>
+<li>通过 @Synchronized 注解使三个方法互斥</li>
+<li>同样设置cur为当前可执行的方法变量</li>
+<li>通过while循环判断是否可执行，不可执行则wait，可执行则执行并notifyAll</li>
+</ol>
+<p>注：</p>
+<ol>
+<li>这里需要用while判断，而非解法二中的if判断，主要是notifyAll会唤醒其他所有的wait，而wait唤醒后是继续执行，如果使用if则有可能条件仍不匹配，但是执行下去，导致与要求不符</li>
+<li>可以看出解法三不如1、2的控制精准，能够唤醒特定线程</li>
+</ol>
+<pre><code class="language-Kotlin">class Foo {
+    var cur = 1
+
+    @Synchronized
+    fun first() {
+        while (cur != 1) {
+            (this as Object).wait()
+        }
+        println(&quot;first&quot;)
+        cur = 2
+        (this as Object).notifyAll()
+    }
+
+    @Synchronized
+    fun second() {
+        while (cur != 2) {
+            (this as Object).wait()
+        }
+        println(&quot;second&quot;)
+        cur = 3
+        (this as Object).notifyAll()
+    }
+
+    @Synchronized
+    fun third() {
+        while (cur != 3) {
+            (this as Object).wait()
+        }
+        println(&quot;third&quot;)
+        cur = 1
+        (this as Object).notifyAll()
+    }
+}
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[1105. Filling Bookcase Shelves —— 题解]]></title>
-        <id>https://hakuless.github.io//post/1105-filling-bookcase-shelves-ti-jie</id>
-        <link href="https://hakuless.github.io//post/1105-filling-bookcase-shelves-ti-jie">
+        <id>https://hakuless.github.io/post/1105-filling-bookcase-shelves-ti-jie</id>
+        <link href="https://hakuless.github.io/post/1105-filling-bookcase-shelves-ti-jie">
         </link>
         <updated>2019-07-03T07:19:48.000Z</updated>
-        <summary type="html"><![CDATA[<p>本周状态不错，可惜好几周没有DP的题，一下卡住了...
+        <summary type="html"><![CDATA[<p>本周状态不错，可惜好几周没有DP的题，一下卡住了...<br>
 <a href="https://leetcode.com/problems/filling-bookcase-shelves/">https://leetcode.com/problems/filling-bookcase-shelves/</a></p>
 ]]></summary>
-        <content type="html"><![CDATA[<p>本周状态不错，可惜好几周没有DP的题，一下卡住了...
+        <content type="html"><![CDATA[<p>本周状态不错，可惜好几周没有DP的题，一下卡住了...<br>
 <a href="https://leetcode.com/problems/filling-bookcase-shelves/">https://leetcode.com/problems/filling-bookcase-shelves/</a></p>
 <!-- more -->
 <h3 id="题目大意">题目大意</h3>
-<p>给出一组书，书有宽、高，架子也有宽度，按照顺序从上向下摆放，问架子至少需要多高才能把书都放完，如下图所示：
-<img src="https://hakuless.github.io//post-images/1562138680833.png" alt="">
+<p>给出一组书，书有宽、高，架子也有宽度，按照顺序从上向下摆放，问架子至少需要多高才能把书都放完，如下图所示：<br>
+<img src="https://hakuless.github.io//post-images/1562138680833.png" alt="" loading="lazy"><br>
 这里需要注意</p>
 <ol>
 <li>书是按顺序放的，所以4、5、6无法放到1的右侧，不属于贪心</li>
 <li>换行策略，如2可以放在1的右侧，但是3就要另起一行，相对占用高度会更大</li>
 </ol>
 <h3 id="题解">题解</h3>
-<p>使用动态规划求解这类 <strong>中间状态</strong> &amp;&amp; <strong>下一个输入</strong> 确定 <strong>下一个状态</strong> 的问题
-本题中，如果没有7的输入，那么高度会是5，而成为6原因是前6个输入的结果
-第7本书可以独立一行，or 与前边连续的n本书一起一行（n从0到6，总体宽度不可以大于架子宽度）
+<p>使用动态规划求解这类 <strong>中间状态</strong> &amp;&amp; <strong>下一个输入</strong> 确定 <strong>下一个状态</strong> 的问题<br>
+本题中，如果没有7的输入，那么高度会是5，而成为6原因是前6个输入的结果<br>
+第7本书可以独立一行，or 与前边连续的n本书一起一行（n从0到6，总体宽度不可以大于架子宽度）<br>
 那么 前6本书的最小高度也可以依照该逻辑求出，即每个状态下的最小高度，最后得出动态方程为</p>
 <pre><code>// n从0取到K-1，直到它们总宽度大于架子宽度
 dp[k] = minOf[dp[k], dp[k-n] + max[height{k-n..k}]]
@@ -61,8 +236,8 @@ dp[k] = minOf[dp[k], dp[k-n] + max[height{k-n..k}]]
     </entry>
     <entry>
         <title type="html"><![CDATA[Union-Find Set]]></title>
-        <id>https://hakuless.github.io//post/union-find-set</id>
-        <link href="https://hakuless.github.io//post/union-find-set">
+        <id>https://hakuless.github.io/post/union-find-set</id>
+        <link href="https://hakuless.github.io/post/union-find-set">
         </link>
         <updated>2019-05-25T03:51:03.000Z</updated>
         <summary type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
@@ -97,20 +272,20 @@ dp[k] = minOf[dp[k], dp[k-n] + max[height{k-n..k}]]
 <li>union(x, y)过程，会根据 ranks值进行比较，然后merge方式不同</li>
 </ol>
 <h3 id="path-compression">Path Compression</h3>
-<p>首先，find寻找过程中同时进行 <strong>path compression</strong> 优化，如建立关联关系时，整个关联图的关系非常的长，如下图：
-<img src="https://hakuless.github.io//post-images/1558768567180.png" alt="">
-当我们要查找1所在组时，会一直遍历到链表头，会非常耗时，因此需要在find过程中进行优化，把1、2、3、5（查找的数据及其所有祖先）均直接指向8（Class ID），拉平我们的树结构（flatten the structure），变成如下图所示：
-<img src="https://hakuless.github.io//post-images/1558768774411.png" alt="">
+<p>首先，find寻找过程中同时进行 <strong>path compression</strong> 优化，如建立关联关系时，整个关联图的关系非常的长，如下图：<br>
+<img src="https://hakuless.github.io//post-images/1558768567180.png" alt="" loading="lazy"><br>
+当我们要查找1所在组时，会一直遍历到链表头，会非常耗时，因此需要在find过程中进行优化，把1、2、3、5（查找的数据及其所有祖先）均直接指向8（Class ID），拉平我们的树结构（flatten the structure），变成如下图所示：<br>
+<img src="https://hakuless.github.io//post-images/1558768774411.png" alt="" loading="lazy"><br>
 这时候我们再次查找时，会大大减少遍历所需时间</p>
 <h3 id="union-by-rank">Union By Rank</h3>
-<p>合并的过程，我们通过Union By Rank来进行优化，原理与上述内容类似，就是为了减少我们查找过程中的耗时。由于我们的merge过程就是把一个组的根节点直接指向另一个组的根节点，那么如果把一个很复杂的结构+到一个简单结构上，会增加整个树的深度，反之则不会增大复杂度。因此我们尽量让深度小的树 attach 到深度大的树上，效果如下图：
-<img src="https://hakuless.github.io//post-images/1558769263768.png" alt="两组进行合并">
-<img src="https://hakuless.github.io//post-images/1558769351883.png" alt="小树attach大树">
-<img src="https://hakuless.github.io//post-images/1558769433973.png" alt="大树attach小树">
+<p>合并的过程，我们通过Union By Rank来进行优化，原理与上述内容类似，就是为了减少我们查找过程中的耗时。由于我们的merge过程就是把一个组的根节点直接指向另一个组的根节点，那么如果把一个很复杂的结构+到一个简单结构上，会增加整个树的深度，反之则不会增大复杂度。因此我们尽量让深度小的树 attach 到深度大的树上，效果如下图：<br>
+<img src="https://hakuless.github.io//post-images/1558769263768.png" alt="两组进行合并" loading="lazy"><br>
+<img src="https://hakuless.github.io//post-images/1558769351883.png" alt="小树attach大树" loading="lazy"><br>
+<img src="https://hakuless.github.io//post-images/1558769433973.png" alt="大树attach小树" loading="lazy"><br>
 可以明显看出，当大树attach小树时，复杂度明显增加，通过一个rank数组记录每一次做深节点的操作（Rank值相同的合并），并用于判断以后的union操作</p>
 <h2 id="leetcode">LeetCode</h2>
 <h3 id="684-redundant-connection">684. Redundant Connection</h3>
-<p>标准的并查集题目，给出一组无向图的边，找到第一个使无相同中产生环的边 =&gt;
+<p>标准的并查集题目，给出一组无向图的边，找到第一个使无相同中产生环的边 =&gt;<br>
 转化为 将给出的边，按顺序把所有的点进行分组，直到发现某条边在添加之前，边的两个点就已经在一组里了，那么此时若加入这条边，即会产生环。</p>
 <pre><code>class Solution {
     fun findRedundantConnection(edges: Array&lt;IntArray&gt;): IntArray {
@@ -152,7 +327,7 @@ dp[k] = minOf[dp[k], dp[k-n] + max[height{k-n..k}]]
 </code></pre>
 <p>这里将所有的关系，录入到并查集中，然后遍历所有的学生所属的组放到Set里，那么Set的长度就是朋友圈的数量</p>
 <h3 id="947-most-stones-removed-with-same-row-or-column">947. Most Stones Removed with Same Row or Column</h3>
-<p>一般并查集的微变形，一个二维棋盘上，散落着一堆石头（每个石头一个点 且 不会有重复），然后我们可以一次一个的取下石头（对石头有要求，需要有其他石头和取下的石头在同一行 or 同一列，即自己单独一行 &amp; 一列 的石头无法取下，天煞孤石）
+<p>一般并查集的微变形，一个二维棋盘上，散落着一堆石头（每个石头一个点 且 不会有重复），然后我们可以一次一个的取下石头（对石头有要求，需要有其他石头和取下的石头在同一行 or 同一列，即自己单独一行 &amp; 一列 的石头无法取下，天煞孤石）<br>
 这里，一组的属性是 行数 or 列数相同，Solution里给出的方案是根据 <strong>Note</strong> 中入参的限制来把 <em>列</em> 转换为 10000+的 <em>行</em> 数，我们这里采用更通用的办法，通过一个Map转换我们的Class ID与数据（ID与属性不需要有强关系）</p>
 <pre><code>class Solution {
     fun removeStones(stones: Array&lt;IntArray&gt;): Int {
@@ -224,14 +399,14 @@ class TypedUFS&lt;T&gt;(var n: Int = 0) {
 </code></pre>
 <p>把行、列有相同情况的元素union在一起，每个组都会留下一个元素，因此我们能有拿走的石头的最大数量就是 石头的数量 减去 并查集组的数量（与之前朋友圈的题目相似）。这里我们使用了一个 <strong>TypedUFS</strong> 来处理非int类型的源数据，map每次分配一个新元素一个新的Key值，最大程度的减少 <strong>parent</strong> 与 <strong>rank</strong> 数组的长度（最大只需要数据源的长度，而非数据源的范围，与Solution的区别）</p>
 <h2 id="参考资料">参考资料</h2>
-<p><a href="https://zxi.mytechroad.com/blog/data-structure/sp1-union-find-set/">花花LeetCode</a>
+<p><a href="https://zxi.mytechroad.com/blog/data-structure/sp1-union-find-set/">花花LeetCode</a><br>
 <a href="https://en.wikipedia.org/wiki/Disjoint-set_data_structure">wiki</a></p>
 ]]></content>
     </entry>
     <entry>
         <title type="html"><![CDATA[Binary Search]]></title>
-        <id>https://hakuless.github.io//post/binary-search</id>
-        <link href="https://hakuless.github.io//post/binary-search">
+        <id>https://hakuless.github.io/post/binary-search</id>
+        <link href="https://hakuless.github.io/post/binary-search">
         </link>
         <updated>2019-05-23T08:05:53.000Z</updated>
         <summary type="html"><![CDATA[<h3 id="introduction">Introduction</h3>
@@ -349,8 +524,8 @@ class TypedUFS&lt;T&gt;(var n: Int = 0) {
     </entry>
     <entry>
         <title type="html"><![CDATA[CSS初级学习]]></title>
-        <id>https://hakuless.github.io//post/css-chu-ji-xue-xi</id>
-        <link href="https://hakuless.github.io//post/css-chu-ji-xue-xi">
+        <id>https://hakuless.github.io/post/css-chu-ji-xue-xi</id>
+        <link href="https://hakuless.github.io/post/css-chu-ji-xue-xi">
         </link>
         <updated>2019-05-16T02:24:37.000Z</updated>
         <summary type="html"><![CDATA[<p>学习一下CSS，前端要是连设计稿都无法实现，基本需求都满足不了~</p>
@@ -363,7 +538,7 @@ class TypedUFS&lt;T&gt;(var n: Int = 0) {
 <pre><code>/* selector {property: value} */
 h1 {color:red; font-size:14px;}
 </code></pre>
-<p><img src="https://hakuless.github.io//post-images/1557976004501.png" alt=""></p>
+<figure data-type="image" tabindex="1"><img src="https://hakuless.github.io//post-images/1557976004501.png" alt="" loading="lazy"></figure>
 <h3 id="样式表书写">样式表书写</h3>
 <p>目前，主要采用内联样式表的书写方案</p>
 <pre><code>&lt;!DOCTYPE html&gt;
@@ -376,7 +551,7 @@ h1 {color:red; font-size:14px;}
 &lt;/html&gt;
 </code></pre>
 <h3 id="规则">@规则</h3>
-<p>通过@开头，后接标识符
+<p>通过@开头，后接标识符<br>
 目前用的比较多的是 @keyframes，通过定义关键帧实现动画效果</p>
 <pre><code>/* @keyframes */
 @keyframes slidein {
@@ -402,11 +577,11 @@ h1 {color:red; font-size:14px;}
 <li>绘制render tree。</li>
 </ol>
 <h3 id="css的工作流程">CSS的工作流程</h3>
-<p><img src="https://hakuless.github.io//post-images/1557976033477.png" alt="">
+<p><img src="https://hakuless.github.io//post-images/1557976033477.png" alt="" loading="lazy"><br>
 <strong>重排</strong> 与 <strong>重绘</strong></p>
 <h2 id="css逻辑属性">CSS逻辑属性</h2>
 <h3 id="新旧逻辑属性对比">新旧逻辑属性对比</h3>
-<p><img src="https://hakuless.github.io//post-images/1557976478759.png" alt="">
+<p><img src="https://hakuless.github.io//post-images/1557976478759.png" alt="" loading="lazy"><br>
 新旧逻辑对比图表如下：</p>
 <table>
 <thead>
@@ -524,8 +699,8 @@ h1 {color:red; font-size:14px;}
    inset:0 0 0 0;   /*top, right, bottom, left - in English*/
 }
 </code></pre>
-<p><img src="https://hakuless.github.io//post-images/1557977057594.png" alt="">
-<img src="https://hakuless.github.io//post-images/1557977069217.png" alt=""></p>
+<p><img src="https://hakuless.github.io//post-images/1557977057594.png" alt="" loading="lazy"><br>
+<img src="https://hakuless.github.io//post-images/1557977069217.png" alt="" loading="lazy"></p>
 <h2 id="css盒子模型">CSS盒子模型</h2>
 <p>待补充</p>
 <h2 id="css选择器">CSS选择器</h2>
@@ -573,19 +748,19 @@ selector::pseudo-element {
 <li>转换函数：matrix()、matrix3d()、perspective()、rotate()、rotate3d()、rotateX()、rotateY()、rotateZ()、scale()、scale3d()、scaleX()、scaleY()、scaleZ()、skew()、skewX()、skewY()、translate()、translateX()、translateY()、translateZ()、translate3d()；</li>
 <li>数学函数：calc()、min()、max()、mixmax()、repeat()；</li>
 <li>缓动函数：cubic-bezier()、steps()；</li>
-<li>其他函数：counter()、counters()、toggle()、var()、 symbols()。
+<li>其他函数：counter()、counters()、toggle()、var()、 symbols()。<br>
 <a href="https://www.w3cplus.com/css/css-functions.html">CSS函数说明</a></li>
 </ul>
 <h2 id="参考资料">参考资料</h2>
-<p><a href="https://krissarea.gitee.io/blog/">鱼头的海上世界</a>
-<a href="https://www.w3.org/TR/?tag=css">CSS W3C标准文档</a>
+<p><a href="https://krissarea.gitee.io/blog/">鱼头的海上世界</a><br>
+<a href="https://www.w3.org/TR/?tag=css">CSS W3C标准文档</a><br>
 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS">CSS MDN文档</a></p>
 ]]></content>
     </entry>
     <entry>
         <title type="html"><![CDATA[JS语法学习]]></title>
-        <id>https://hakuless.github.io//post/js-yu-fa-xue-xi</id>
-        <link href="https://hakuless.github.io//post/js-yu-fa-xue-xi">
+        <id>https://hakuless.github.io/post/js-yu-fa-xue-xi</id>
+        <link href="https://hakuless.github.io/post/js-yu-fa-xue-xi">
         </link>
         <updated>2019-05-09T03:41:59.000Z</updated>
         <content type="html"><![CDATA[<h2 id="generators">Generators</h2>
@@ -595,8 +770,8 @@ selector::pseudo-element {
     </entry>
     <entry>
         <title type="html"><![CDATA[Stack & DFS]]></title>
-        <id>https://hakuless.github.io//post/stack-and-dfs</id>
-        <link href="https://hakuless.github.io//post/stack-and-dfs">
+        <id>https://hakuless.github.io/post/stack-and-dfs</id>
+        <link href="https://hakuless.github.io/post/stack-and-dfs">
         </link>
         <updated>2019-02-19T12:00:22.000Z</updated>
         <summary type="html"><![CDATA[<h3 id="stack-dfs">Stack &amp; DFS</h3>
@@ -650,8 +825,8 @@ boolean DFS(int root, int target) {
     </entry>
     <entry>
         <title type="html"><![CDATA[ArrayList.sort踩坑之旅]]></title>
-        <id>https://hakuless.github.io//post/arraylistsort-cai-keng-zhi-lu</id>
-        <link href="https://hakuless.github.io//post/arraylistsort-cai-keng-zhi-lu">
+        <id>https://hakuless.github.io/post/arraylistsort-cai-keng-zhi-lu</id>
+        <link href="https://hakuless.github.io/post/arraylistsort-cai-keng-zhi-lu">
         </link>
         <updated>2018-04-09T13:18:21.000Z</updated>
         <content type="html"><![CDATA[<h2 id="背景">背景</h2>
@@ -689,7 +864,7 @@ boolean DFS(int root, int target) {
 </code></pre>
 <p>直觉上，对于不关注的属性排序顺序无所谓，就在最后的 else 全部给了 return 1，对于一些数据会爆出crash：java.lang.IllegalArgumentException: Comparison method violates its general contract!</p>
 <h2 id="解决">解决</h2>
-<p>查询定位问题产生原因 &amp; 解决问题比较容易，直接查Google也能发现这个Crash Log的含义是Compare自己违反了自己的约定，即排序自身出现了冲突，产生了如 C &gt; A &gt; B &gt; C 这样的结果，显然这种是明显的异常。
+<p>查询定位问题产生原因 &amp; 解决问题比较容易，直接查Google也能发现这个Crash Log的含义是Compare自己违反了自己的约定，即排序自身出现了冲突，产生了如 C &gt; A &gt; B &gt; C 这样的结果，显然这种是明显的异常。<br>
 修复方案也十分的简单，只要对于不关心的属性return 0即可，即认为值相等，对于上述核心内容修改如下：</p>
 <pre><code class="language-Java">// sort by three dimensions, can be selected, value &amp; end time
 if (canSelect1 &amp;&amp; !canSelect2) {
@@ -765,47 +940,47 @@ if (canSelect1 &amp;&amp; !canSelect2) {
     assert ts.stackSize == 1;
 }
 </code></pre>
-<p>看一下TimSort的sort方法，排序长度小于1的直接返回，无需排序，对于长度小于MIN_MERGE（当前环境为32），先用countRunAndMakeAscending预处理，然后用二分查找插入排序，这个过程中两个数只会比较一次，并不会引发上述crash的内容，因此目标应该是在后面，对于大量数据拆分。
-其实通过crash log也能定位到，这个异常是在TimSort的 mergeLo &amp; mergeHi 方法中抛出，如下图：	<img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fq5grlrdc1j318u04q759.jpg" alt=""></p>
+<p>看一下TimSort的sort方法，排序长度小于1的直接返回，无需排序，对于长度小于MIN_MERGE（当前环境为32），先用countRunAndMakeAscending预处理，然后用二分查找插入排序，这个过程中两个数只会比较一次，并不会引发上述crash的内容，因此目标应该是在后面，对于大量数据拆分。<br>
+其实通过crash log也能定位到，这个异常是在TimSort的 mergeLo &amp; mergeHi 方法中抛出，如下图：	<img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fq5grlrdc1j318u04q759.jpg" alt="" loading="lazy"></p>
 <h3 id="算法流程">算法流程</h3>
 <h4 id="countrunandmakeascending">countRunAndMakeAscending</h4>
-<p>首先，通过countRunAndMakeAscending方法，将整个数组变为划分为多个升序 or 降序的片段，每个片段是一个Run，对于降序的将其通过reverseRange将其转换为升序，核心代码如下图：<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq5h2udmcrj319i0au76s.jpg" alt="">
-如：{1, 3, 2, 10, 5, 4, 1} 会发生3次分片
+<p>首先，通过countRunAndMakeAscending方法，将整个数组变为划分为多个升序 or 降序的片段，每个片段是一个Run，对于降序的将其通过reverseRange将其转换为升序，核心代码如下图：<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq5h2udmcrj319i0au76s.jpg" alt="" loading="lazy"><br>
+如：{1, 3, 2, 10, 5, 4, 1} 会发生3次分片<br>
 {1, 3}正常升序 {2, 10}正常升序 {1, 4, 5}降序被reverse成为升序</p>
 <h4 id="mergecollapse-mergeforcecollapse">mergeCollapse &amp; mergeForceCollapse</h4>
-<p>将Run放到一个栈结构中，并对相邻的Run进行merge操作。
-先举个最简单的例子，数组123454321的排序流程如下，先分Run片段，再merge。
-{1, 2, 3, 4, 5}
-{1, 2, 3, 4, 5}, {1, 2, 3, 4}
+<p>将Run放到一个栈结构中，并对相邻的Run进行merge操作。<br>
+先举个最简单的例子，数组123454321的排序流程如下，先分Run片段，再merge。<br>
+{1, 2, 3, 4, 5}<br>
+{1, 2, 3, 4, 5}, {1, 2, 3, 4}<br>
 {1, 1, 2, 2, 3, 3, 4, 4, 5}</p>
-<p>问题就发生在这个merge的过程中，首先这个merge过程并不是入个栈就merge的，它有个条件如下图：
-<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq5ifn2e30j313a0fw0v0.jpg" alt=""></p>
+<p>问题就发生在这个merge的过程中，首先这个merge过程并不是入个栈就merge的，它有个条件如下图：<br>
+<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq5ifn2e30j313a0fw0v0.jpg" alt="" loading="lazy"></p>
 <ol>
 <li>只对相邻的区块merge</li>
 <li>若当前区块数 &gt;= 3，If X &lt;= Y + Z，若 X &gt;= Z, 则将 Y 和 Z merge，否则 合并 X 和 Y</li>
 <li>若当前区块数仅为 2，If X&lt;= Y，将 X 和 Y merge</li>
 <li>不满足则等待下一个Run入栈，直到完全没有入栈数据，则用mergeForceCollapse强制merge所有Run（这里仍然有通过长度不同选择顺序的逻辑）</li>
 </ol>
-<p>上述流程如下图所示：
-<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fq9ybsclcwj31cg0jo3zl.jpg" alt="">
+<p>上述流程如下图所示：<br>
+<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fq9ybsclcwj31cg0jo3zl.jpg" alt="" loading="lazy"><br>
 发生问题的核心原因就是在merge的过程中，罪魁祸首在比较顺序的不统一，并不一直是index小的比较index大的，在 mergeHi &amp; mergeLo 中通过计算count的赢点，即要合并的数组中，你有多少比我最小值还小 or 比我最大值还大的。掐头去尾后，再次比较两个cursor，两个cursor都从大到小开始遍历，然后比较寻找插入的位置，然而在寻找这个插入位置时，compare(B[cursor2],A[cursor1])，因此会与compare(A[cursor1],B[cursor2])的结果不一致。</p>
 <h4 id="bug产生详解">bug产生详解</h4>
-<p>详细举例说明：两个数组A、B 分别是{1，3，3，5，7，10} 和 {3，8，12，15}，首先进行掐头去尾，如下图：
-<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fq6enhy0r6j3120054mxa.jpg" alt="">
+<p>详细举例说明：两个数组A、B 分别是{1，3，3，5，7，10} 和 {3，8，12，15}，首先进行掐头去尾，如下图：<br>
+<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fq6enhy0r6j3120054mxa.jpg" alt="" loading="lazy"><br>
 A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，而这里两边3的比较是按照compare(B[0], A[1])比较的，由于代码的错误导致没有比较出相等，而是比较为小于，因此3被保留。正常情况应该应该一直将A中的两个3也掐掉，对于相等的处理是A中的掐头掐掉，B的去尾去掉。下面我们将这两个错误的3标红表示正常情况下不该保留。</p>
 <blockquote>
 <p>注：掐头去尾过程也是二分法比较寻找到需要的offset</p>
 </blockquote>
-<p>让我们继续，下面开始进行merge排序，两个cursor分别指向A、B的尾部，比较后插入。
-<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fq6f4d9z64j30wi0act90.jpg" alt="">
-这个过程中，我们会认为A中最小的元素要大于B中最小的元素（因为掐头的原因），merge的过程中不断的移动cursor1和cursor2直到cursor1到头，然后就可以将B中剩余的元素全部移入A的头部即可完成排序。但是，当比较到两边3的过程时，由于比较顺序的变化，会把B中的3插入到A[2]位置，当cursor1再次移动时，查找B发现B已经空了，这不符合预想“A中最小的元素要大于B中最小的元素”，应该A先空，B后空才正确，因此JDK中主动throw了我们遇到的Exception。
-<img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq6fmu2w7zj31060eswfh.jpg" alt="">
+<p>让我们继续，下面开始进行merge排序，两个cursor分别指向A、B的尾部，比较后插入。<br>
+<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fq6f4d9z64j30wi0act90.jpg" alt="" loading="lazy"><br>
+这个过程中，我们会认为A中最小的元素要大于B中最小的元素（因为掐头的原因），merge的过程中不断的移动cursor1和cursor2直到cursor1到头，然后就可以将B中剩余的元素全部移入A的头部即可完成排序。但是，当比较到两边3的过程时，由于比较顺序的变化，会把B中的3插入到A[2]位置，当cursor1再次移动时，查找B发现B已经空了，这不符合预想“A中最小的元素要大于B中最小的元素”，应该A先空，B后空才正确，因此JDK中主动throw了我们遇到的Exception。<br>
+<img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq6fmu2w7zj31060eswfh.jpg" alt="" loading="lazy"><br>
 由于compare的错误写法，导致A的cursor未遍历到头部就完成了merge，B中的元素全部被插入到A里了，这与开始的<strong>掐头去尾</strong>有明显的冲突，最后应该剩余1个or多个元素，再一起copy到A的头部才是正常的结果。</p>
 <p>一顿凌乱的JDK代码，最后因优化减少比较次数，发生了这个问题，具体代码实在太乱了... JDK的还不好调试... 最后还是要感谢前辈们踩的坑，不然这个问题细节的研究还会多花一些时间...</p>
-<p>最终结论，并不是只要有相等的元素就会crash，而是对分Run片有一定要求，需要比较顺序发生不一致的场景才有可能发生。
-<img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq5k488ttkj315o040gmh.jpg" alt=""></p>
+<p>最终结论，并不是只要有相等的元素就会crash，而是对分Run片有一定要求，需要比较顺序发生不一致的场景才有可能发生。<br>
+<img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq5k488ttkj315o040gmh.jpg" alt="" loading="lazy"></p>
 <h4 id="crash数据">Crash数据</h4>
-<p>数组：{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-2,1,0,-2,0,0,0,0};
+<p>数组：{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-2,1,0,-2,0,0,0,0};<br>
 排序接口实现：</p>
 <pre><code class="language-Java">if (o1 &gt; o2) {
     1
@@ -814,14 +989,14 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 }
 </code></pre>
 <h2 id="thanks-to">Thanks to</h2>
-<p><a href="http://blog.2baxb.me/archives/993">图解JDK7的Comparison method violates its general contract异常</a>
+<p><a href="http://blog.2baxb.me/archives/993">图解JDK7的Comparison method violates its general contract异常</a><br>
 <a href="https://blog.csdn.net/shadow_zed/article/details/72758912">crash数据</a></p>
 ]]></content>
     </entry>
     <entry>
         <title type="html"><![CDATA[2017年终总结]]></title>
-        <id>https://hakuless.github.io//post/2017-nian-zhong-zong-jie</id>
-        <link href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">
+        <id>https://hakuless.github.io/post/2017-nian-zhong-zong-jie</id>
+        <link href="https://hakuless.github.io/post/2017-nian-zhong-zong-jie">
         </link>
         <updated>2018-02-13T07:47:58.000Z</updated>
         <summary type="html"><![CDATA[<p>2017算是毕业之后过的最Happy的一年了，没有别的原因，就是终于有点小钱了..</p>
@@ -910,7 +1085,7 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 <blockquote>
 <p>动漫是戒不了了，这辈子都戒不掉了！</p>
 </blockquote>
-<p>目前仍有很多好动画正在追，如 银魂、魔法使的新娘、龙王的工作（萝莉控必看），动漫估计会跟我一辈子了！
+<p>目前仍有很多好动画正在追，如 银魂、魔法使的新娘、龙王的工作（萝莉控必看），动漫估计会跟我一辈子了！<br>
 漫画在追的更多，全写上的话基本上本文就不用干别的了，只提一个吧《GrandBlue碧蓝之海》，这个搞笑程度可以排第一了!大半夜的看，看得我乐出了声，根本停不下来啊！</p>
 <h2 id="总结">总结</h2>
 <p>今年要做的事：</p>
@@ -920,14 +1095,14 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 <li>学习 Android &amp; TensorFlow</li>
 <li>接着赚钱</li>
 </ol>
-<p>今天是2018.02.13，明天情人节坐飞机回家... 后天就是大年三十...
+<p>今天是2018.02.13，明天情人节坐飞机回家... 后天就是大年三十...<br>
 新的一年还是没想找女朋友（也没有不想找！！）</p>
 ]]></content>
     </entry>
     <entry>
         <title type="html"><![CDATA[Freeline修改笔记]]></title>
-        <id>https://hakuless.github.io//post/freeline-xiu-gai-bi-ji</id>
-        <link href="https://hakuless.github.io//post/freeline-xiu-gai-bi-ji">
+        <id>https://hakuless.github.io/post/freeline-xiu-gai-bi-ji</id>
+        <link href="https://hakuless.github.io/post/freeline-xiu-gai-bi-ji">
         </link>
         <updated>2017-12-25T02:37:58.000Z</updated>
         <content type="html"><![CDATA[<h2 id="起因">起因</h2>
@@ -936,8 +1111,8 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 <p>而对我来说最蛋疼不过的就是Freeline（0.8.8）不支持子module有falvor，而看到freeline的issue和mr也有人提出相应的问题及代码，所以决定本地开搞一个兼容该情况的<strong>Freeline</strong>！😜</p>
 <h2 id="工作流程">工作流程</h2>
 <h3 id="不支持什么">不支持什么？</h3>
-<p>首先，先让我们看下什么都不做的情况下用Freeline build会有什么问题，执行一下py freeline.py -d，发现编译不过会报错.. 截图如下：
-<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsuqhg299j30vi0d6js4.jpg" alt=""></p>
+<p>首先，先让我们看下什么都不做的情况下用Freeline build会有什么问题，执行一下py freeline.py -d，发现编译不过会报错.. 截图如下：<br>
+<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsuqhg299j30vi0d6js4.jpg" alt="" loading="lazy"></p>
 <p>详细的看下，会发现是许多资源（可以包括java代码、xml和图片等）找不到，追其原因是flavor是按文件夹打包。比如打dianping渠道，会打包dianping和main文件夹，而meituan则会打meituan和main文件夹，对于这种Freeline的现状就只会打main文件夹... 所以只要flavor文件夹里有必要的内容就build不起来了.. 😂</p>
 <h3 id="如何修改">如何修改？</h3>
 <p>万能的gayhub上有许多大神潜伏者，<a href="https://github.com/alibaba/freeline/pull/857">https://github.com/alibaba/freeline/pull/857</a>，这里就是其中解决的PR，具体详细的解决原因后面再说，现在先说下这个该如何使用。</p>
@@ -954,19 +1129,19 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 <ul>
 <li>修改groovy代码，具体diff只有一行 <a href="https://github.com/alibaba/freeline/pull/857/files#diff-4">https://github.com/alibaba/freeline/pull/857/files#diff-4</a>，只需要把module的flavor和buildtype传入即可，其余的工作可以直接交给python脚本即可</li>
 <li>而由于我们需要发布到本地的maven库，为防止与freeline官方混淆，可以修改版本号 or 包名，我采用的方案是把版本号改成0.8.9（截至目前还未发布）</li>
-<li>修改版本号一共两部分，1是gradle.porperties中的，2是build.gradle发布中的，如下图所示：
-<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsvgkwshyj30x407iq37.jpg" alt="">
-<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsvh8m0dzj30x40auglw.jpg" alt=""></li>
+<li>修改版本号一共两部分，1是gradle.porperties中的，2是build.gradle发布中的，如下图所示：<br>
+<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsvgkwshyj30x407iq37.jpg" alt="" loading="lazy"><br>
+<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fmsvh8m0dzj30x40auglw.jpg" alt="" loading="lazy"></li>
 </ul>
 <h4 id="本地发布">本地发布</h4>
-<p>修改好代码后，我们需要将gradle插件发布到本地，在freeline工程根目录执行./gradlew install，执行完成后你就会发现你的插件发布在本地maven的仓库中了。对于mac来说路径在~/.m2隐藏文件夹下，并且版本号是你发布的版本号！
-<img src="https://ws1.sinaimg.cn/large/006tNc79gy1fmsvlu520uj30u806qmxf.jpg" alt=""></p>
+<p>修改好代码后，我们需要将gradle插件发布到本地，在freeline工程根目录执行./gradlew install，执行完成后你就会发现你的插件发布在本地maven的仓库中了。对于mac来说路径在~/.m2隐藏文件夹下，并且版本号是你发布的版本号！<br>
+<img src="https://ws1.sinaimg.cn/large/006tNc79gy1fmsvlu520uj30u806qmxf.jpg" alt="" loading="lazy"></p>
 <h4 id="修改项目">修改项目</h4>
 <p>这回需要修改咱们自己的工程了~ 首先，如果你的build.gradle下的repositories如果没有mavenLocal请+一下，并且放在第一个，然后将你依赖中的freeline:gradle的版本改成你刚才build的版本（对我来说是0.8.9）</p>
 <p>接下来，与正常直接引入freeline无差异，sync后执行./gradlew initFreeline -Pmirror，我这网不够好，用镜像能快不少... 执行完成后，会自动拉取官方freeline的python代码，你也可以修改gradle插件的下载路径，直接下载你将要修改的python，我是懒得发布... 就直接本地改吧，反正freeline更新频率还是很低的..</p>
-<p><img src="https://ws3.sinaimg.cn/large/006tNc79gy1fmsw1hkox5j31ju0r83zq.jpg" alt="">
-在旧版本的项目信息中，modules只会包含name 和 path，而使用本地插件后，则会增加flavor和buildtype这两个属性，如下图所示：
-<img src="https://ws1.sinaimg.cn/large/006tNc79gy1fmsw8aibobj31g20ogwfr.jpg" alt=""></p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNc79gy1fmsw1hkox5j31ju0r83zq.jpg" alt="" loading="lazy"><br>
+在旧版本的项目信息中，modules只会包含name 和 path，而使用本地插件后，则会增加flavor和buildtype这两个属性，如下图所示：<br>
+<img src="https://ws1.sinaimg.cn/large/006tNc79gy1fmsw8aibobj31g20ogwfr.jpg" alt="" loading="lazy"></p>
 <p>之后还要修改主工程根目录下freeline文件夹中的<strong>gradle_tools.py</strong>，具体diff参考<a href="https://github.com/alibaba/freeline/pull/857/files#diff-9">https://github.com/alibaba/freeline/pull/857/files#diff-9</a>，将flavor加入打包的资源路径，下面就可以执行python freeline.py -d -f了！</p>
 <p>注意：如果你要修改打包渠道，需要执行一次python freeline.py -f，强制重新写一遍projectInfo，否则默认会用原来的配置进行增量编译。</p>
 <p>在之后，就可以愉快的使用增量编译了，在一些超大App动辄编译一下5~10min都只要20s以内就可以搞定！</p>
@@ -975,189 +1150,6 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 <p>之前，之所以没支持子module的flavor，主要是因为module资源的路径地址没有增加flavor文件夹，所以通过简单的传参，从gradle插件层 -&gt; python脚本层把flavor传过来即可。</p>
 <h2 id="总结">总结</h2>
 <p>本次算是第一个对gradle插件的开发流程稍有了解，接下来打算从零开发一个插件。开发插件与java开发module的技术栈还是有不少差异的~ 开启新的技能点！（如果可以的话，真想全职去搞Freeline 😁）</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Android Camera踩坑详解]]></title>
-        <id>https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie</id>
-        <link href="https://hakuless.github.io//post/android-camera-cai-keng-xiang-jie">
-        </link>
-        <updated>2017-12-12T13:09:23.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
-<p>首先，本文主要以 <strong>android.hardware.Camera</strong> 包来叙述内容，其实Google官方已经把其作为Deprecated的了，但由于新的包 **android.hardware.camera2 **需要最低API level 21，即需要Android 5.0以上，且国内很多厂商对这个接口的支持并不好，因此暂不考虑（主要内容其实变化不大）
-有兴趣的同学，可以看 <a href="https://github.com/google/cameraview">https://github.com/google/cameraview</a> ，Google提供的一个CameraView，可以自动判断使用哪个API~</p>
-<h2 id="开发流程">开发流程</h2>
-<p><a href="https://developer.android.com/reference/android/hardware/Camera.html">https://developer.android.com/reference/android/hardware/Camera.html</a>
-官方引导文档如上，大致开发流程可以按照上述文档来，本文主要内容讲拍照相关，摄像相关暂不涉猎。</p>
-<h3 id="api选择">API选择</h3>
-<p><img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fmcn3b6mrjj30k20agmxb.jpg" alt="">
-首先先要进行API选择，Google共提供两种控制摄像头的API，新的API是Camera2... 但是点评美团的minSdk是16，估计短期内都无法升到21，因此使用Camera1进行，当然也可以直接使用google的这个CameraView，根据SDK VERSION使用不同的API。</p>
-<pre><code class="language-kotlin">if (Build.VERSION.SDK_INT &lt; 21) {            
-		mImpl = new Camera1(mCallbacks, preview);        
-} else if (Build.VERSION.SDK_INT &lt; 23) {            
-		mImpl = new Camera2(mCallbacks, preview, context);        
-} else {            
-		mImpl = new Camera2Api23(mCallbacks, preview, context);        
-}
-</code></pre>
-<p>本着嫌麻烦的原则，放弃了该方法，主要原因有2：</p>
-<ol>
-<li>测试需要测试3种不同Android版本的手机，确保每个分支都覆盖到，条件不允许</li>
-<li>点评、美团客户端对第三方包的引入都有限制，非com.dianping or com.meituan的包都需要申请（support包中的gridview都有问题，更不必说这个camera了）而自己粘的话，会引入不少代码，因此放弃</li>
-</ol>
-<p>下面的讲解均按照Camera1来讲述，Camera2会有些不同，仅供参考</p>
-<h2 id="camera工作流程">Camera工作流程</h2>
-<h3 id="surfaceview-vs-textureview">SurfaceView vs TextureView</h3>
-<p>代码核心的元素有2个，一个是Camera用于控制及获取摄像头信息，另一个是用于展示预览效果的View，可以使用TextureView or SurfaceView。这两个View的绘制都是在独立的线程中，因此在预览摄像头的过程中并不会阻塞UI线程，并且SurfaceView使用一个独立的窗口，无法对其使用平移、缩放等动画，而TextureView和普通的View在同一个窗口下，可以使用动画。详细的比较可以看<a href="https://github.com/crosswalk-project/crosswalk-website/wiki/Android-SurfaceView-vs-TextureView">https://github.com/crosswalk-project/crosswalk-website/wiki/Android-SurfaceView-vs-TextureView</a>，这里介绍了很多SurfaceView与TextureView的对比。RD可以根据需求选用相应的View预览摄像头的内容。主要分别以下：</p>
-<ol>
-<li>SurfaceView不能执行View的动画，TextureView可以</li>
-<li>多个SurfaceView不能叠加，TextureView可以</li>
-<li>TextureView必须在硬件加速的窗口中</li>
-<li>TextureView消耗的内存比SurfaceView大</li>
-</ol>
-<p>综上所述，在美团8.9海外拍照翻译中，使用SurfaceView进行承载摄像头数据。</p>
-<h3 id="camera初始化">Camera初始化</h3>
-<p>首先，在SurfaceView的SurfaceCreated回调中进行摄像头的初始化，设置相关参数。</p>
-<pre><code class="language-kotlin">// 选择摄像头，使用后置摄像头
-int numberOfCameras = Camera.getNumberOfCameras();
-for (int i = 0; i &lt; numberOfCameras; i++) {
-    Camera.CameraInfo info = new Camera.CameraInfo();
-    Camera.getCameraInfo(i, info);
-    if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-        mCameraId = i;
-        break;
-    }
-}
-
-mCamera = Camera.open(mCameraId);
-mCamera.setPreviewDisplay(mSurfaceView.getHolder());
-mCamera.startPreview();
-</code></pre>
-<p>摄像头可以有多个（前置 &amp; 后置），根据需求选择相应的摄像头，并通过open(cameraId)方法获取并打开相应摄像头（默认不传参打开后置，但很怕有特的手机 or Rom默认前置摄像头的...）
-对于使用SurfaceView承载预览数据的，通过使用setPreviewDisplay方法，设置预览所用的内容，这时通过startPreview就会发现，SurfaceView的部分会展示摄像头的内容了~</p>
-<h3 id="camera参数配置">Camera参数配置</h3>
-<p>如果你是直接按照上述代码开发，有很大概率你会踩到深坑~ 主要以下N个（一个个都是泪啊）：</p>
-<ul>
-<li>你会发现，你预览的窗口是歪的... 即你是竖着拍，但是SurfaceView中的预览是横着的...这个原因是摄像头的安装方向和手机垂直方向不一致，而是使用手机的水平方向... 因此，需要设置摄像头的方向，这时候又会引入另一个问题，就是摄像头的安装方向也可能不一样，大部分手机是旋转90°，但有些手机是需要旋转270°... 如坑爹的Nexus 5X... 因此这个旋转角度还不能写死，需要通过获取CameraInfo获取方向的不同来设置不同的角度~   (╬￣皿￣)=○</li>
-</ul>
-<pre><code class="language-kotlin">android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-android.hardware.Camera.getCameraInfo(cameraId, info);
-int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-int degrees = 0;
-switch (rotation) {
-    case Surface.ROTATION_0:
-        degrees = 0;
-        break;
-    case Surface.ROTATION_90:
-        degrees = 90;
-        break;
-    case Surface.ROTATION_180:
-        degrees = 180;
-        break;
-    case Surface.ROTATION_270:
-        degrees = 270;
-        break;
-}
-
-int result;
-if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-    result = (info.orientation + degrees) % 360;
-    result = (360 - result) % 360;      // compensate the mirror
-} else {
-    // back-facing
-    result = (info.orientation - degrees + 360) % 360;
-}
-mCamera.setDisplayOrientation(result);
-</code></pre>
-<ul>
-<li>
-<p>预览、拍照分辨率很不清晰造成这个情况的主要原因有二，一是预览和拍照的分辨率需要设置且需要单独设置！二是预览和拍照时需要进行对焦。首先针对第一个问题踩的坑进行说明，主要需要注意以下两点：</p>
-<ul>
-<li>分辨率单独设置预览分辨率 和 拍照分辨率是两个不同的属性，需要单独设置。而且，每个摄像头只能设置成其支持的预览和拍照分辨率，不是可以随便任意塞值的。比如你的surfaceView是1050x1564这种诡异的分辨率，那就<strong>只能</strong>（没经过太多调研，如果有其他好方案，谢谢告知）手动去截断 or 自动拉伸。同时，摄像头支持的 拍照分辨率 和 预览分辨率 很可能不相符，代码如下：</li>
-</ul>
-<pre><code class="language-java">// 获取支持分辨率
-mCamera.getParameters().getSupportedPreviewSizes();
-mCamera.getParameters().getSupportedPictureSizes();
-
-/**
- * 获取最佳预览分辨率
- *
- * @param sizeList    摄像头支持分辨率列表
- * @return 适当的分辨率，如果没有符合逻辑的，则选用最大的
- */
-public static Camera.Size getFitSize(List&lt;Camera.Size&gt; sizeList) {
-
-    // 首先，将摄像头支持的分辨率 降序排序
-    if (CollectionUtils.isEmpty(sizeList)) {
-        return null;
-    }
-    Collections.sort(sizeList, (lhs, rhs) -&gt; {
-        if (lhs.width * lhs.height &lt; rhs.width * rhs.height) {
-            return 1;
-        } else if (lhs.width * lhs.height &gt; rhs.width * rhs.height) {
-            return -1;
-        } else {
-            return 0;
-        }
-    });
-
-    // 对于很多机型，符合4：3摄像头比较多，而且与预览窗口大小比较适合
-    double surfaceRate = 0.75;
-
-    for (Camera.Size size : sizeList) {
-        double previewRate = (double) size.height / (double) size.width;
-        if (Math.abs(previewRate - surfaceRate) &lt; RATE_BOUNDS) {
-            return size;
-        }
-    }
-
-    return sizeList.get(0);
-}
-</code></pre>
-<p>这两个不同的方法分别获取支持的预览分辨率（Preview）和拍照分辨率（Picture），而且这两个数组可能数据不一致，因此在设置时不能保证设置相同的分辨率，只能使用相近的宽高比。比如在本需求中，首先将分辨率数组由大到小排序，然后选取其中宽高比中第一个接近4：3的（比值差值小于0.1）。目前来讲，一般摄像头都会有比较大的支持16：10、16：9及4：3等主流比例的分辨率。这里选取的比例主要看你开发使用的SurfaceView等容器的比例，否则会有比较强烈的拉伸感。若是没有设置预览&amp;拍照分辨率，那系统会选取默认最小的分辨率，基本就没法看了 ╥﹏╥...</p>
-<ul>
-<li>其次，还会有模糊的状态，主要原因是摄像头对焦使用的问题</li>
-</ul>
-</li>
-</ul>
-<pre><code>// 获取支持分辨率
-mCamera.getParameters().getSupportedFocusModes();
-parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-</code></pre>
-<p>与设置分辨率类似，同样摄像头支持的对焦模式不尽相同，因此需要获取到Support的模式，然后根据需求的优先级设置相应的对焦模式。文档可以看<a href="https://developer.android.com/reference/android/hardware/Camera.Parameters.html">https://developer.android.com/reference/android/hardware/Camera.Parameters.html</a>，拍照可以使用FOCUS_MODE_CONTINUOUS_PICTURE，录像可以使用FOCUS_MODE_CONTINUOUS_VIDEO。</p>
-<h3 id="camera状态管理">Camera状态管理</h3>
-<p>Camera参数配置完成后，会有各种状态，本次开发主要涉及到以下几种：</p>
-<ol>
-<li>预览开启状态 mCamera.startPreview();</li>
-<li>预览停止状态 mCamera.stopPreview();</li>
-<li>进行拍照 mCamera.takePicture(null, null, mCallback);</li>
-<li>闪光灯状态 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF/ON);</li>
-</ol>
-<ul>
-<li>
-<p>首先，如果想让SurfaceView展示摄像头预览的内容，需要调用startPreview才能开始有数据流输入，之后会根据设置的聚焦参数逐渐自动聚焦，对于需要点击按钮进行拍照的，可以通过调用takePicture方法获取回调处理拍照的数据。</p>
-</li>
-<li>
-<p>这里我们会踩到第一个坑，就是对stopPreview的处理。部分手机调用takePicture方法后，会自动停止预览，保留拍照前的最后一帧画面，而部分手机不会停止预览，你会发现即便点了拍照按钮，预览仍然继续，因此拍照后是否停止预览需要手动调用执行stopPreview，不能够依赖系统的默认效果（许多硬件相关开发都是要遵循这个原则啊~）</p>
-</li>
-<li>
-<p>接下来，就是与生命周期相关了，无论你的代码是在Activity or Fragment中，当回调到onPause时，都需要手动释放当前持有的摄像头，否则其他页面无法持有手机的摄像头... 而这时候则会遇到第二个坑，当你onResume时，摄像头的状态无法保证。如你开启了闪光灯，onStop时释放摄像头，onResume时重新持有，这时候闪光灯是开是关？答案就是有些手机是开着的... 有些手机是关着的... 而且这个你通过Camera.getParameters方法获取的摄像头状态不一定是准确的！这个你敢信！因此需要我们手动在onSaveInstanceState中保留我们想要的状态数据，并在onRestoreInstanceState重新赋值属性，才能保证我们的逻辑没有错误。</p>
-</li>
-<li>
-<p>然后点击拍照，你就有可能遇到下一个坑... 也许你还记得上文提到的摄像头安装方向导致预览方向与预期不一致的问题，然后我告诉你，拍照也会有这个问题 ﾍ(;´Д｀ﾍ) 同样的，在你获取拍照数据后，需要手动旋转Bitmap，详细逻辑与上文类似，不再赘述</p>
-</li>
-</ul>
-<h3 id="权限处理">权限处理</h3>
-<p>作为Android开发，大家都知道在Android 6.0以后部分权限需要动态申请，而不是像之前那样安装时就会直接获取，摄像头则在需要申请的那组危险权限中（确实能理解，你可以想想后台一个推送，或一个长链发送个数据，你的摄像头自动打开开始录像...）</p>
-<p>默认情况下，如果没有申请权限直接调用Camera相关的方法，会直接崩溃，如调用startPreview。而有些ROM自以为人性化的自动会帮你申请权限，防止App崩溃，但作为开发人员无法依赖这种ROM提供的功能，还是每次要自己申请。而权限主要可以分为3种授权状态，<strong>授权</strong>、<strong>询问</strong>、<strong>拒绝</strong>。其中授权就是该App可以任意调用该权限，询问是每次调用关键方法都要申请，需要用户手点同意才会继续执行回调。拒绝则是连弹窗都不会弹，因此需要把部分代码try catch住，并在其exception部分弹出提示，让用户手动赋予App相应的权限。</p>
-<p>这里并不是摄像头开发的重点，而且很多其他需要权限的业务开发也都会涉及到，不详述，但还是说说踩住的坑... 主要的问题就在这个申请权限部分，不同的ROM处理不同，这就是<strong>无底深渊</strong></p>
-<ol>
-<li>有些ROM权限弹窗不会阻塞主线程，你会发现你的代码仍然继续执行并在无权限的情况下，走到了Exception中，用户啥操作都没干呢，但系统把你的提示文案都弹了</li>
-<li>有些ROM权限判断有误...明明手机上应用程序权限设置的是询问 or 拒绝，但代码中获取到的Granted就是true，真是不知道咋搞的 还是信任try catch多一点，不然上线一定崩崩崩 ⊙﹏⊙|||</li>
-</ol>
-<h2 id="总结">总结</h2>
-<p>至此，本文说了许多开发拍照相关功能会踩到的坑。其实本期翻译的业务需求开发还涉及到很多其他内容，如jpg格式图片压缩、方向感应、动画等，但与拍照相关的共性不是很多，以后其他人开发很难会遇到，也就不说了...</p>
-<p>还是多开发这种需求，才能体会到所谓的Android碎片化，一个屏幕分辨率适配还是无法体现出我大Android碎片的恶心程度的！</p>
 ]]></content>
     </entry>
 </feed>

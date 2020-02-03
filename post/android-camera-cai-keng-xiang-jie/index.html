@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1562294380249">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1580701833955">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
@@ -29,7 +29,7 @@
   <div class="site-header">
     <div class="left">
       <a href="https://hakuless.github.io/">
-        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1562294380249" alt="" width="32px" height="32px">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1580701833955" alt="" width="32px" height="32px">
       </a>
       <a href="https://hakuless.github.io/">
         <h1 class="site-title">HaKuLess</h1>
@@ -86,14 +86,14 @@
               <span>
                 <i class="icon-pricetags-outline"></i>
                 
-                  <a href="https://hakuless.github.io//tag/tech">
+                  <a href="https://hakuless.github.io/tag/tech">
                     Tech
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/android">
+                  <a href="https://hakuless.github.io/tag/android">
                     Android
                     
                   </a>
@@ -103,13 +103,13 @@
           </div>
           <div class="post-content">
             <h2 id="前言">前言</h2>
-<p>首先，本文主要以 <strong>android.hardware.Camera</strong> 包来叙述内容，其实Google官方已经把其作为Deprecated的了，但由于新的包 **android.hardware.camera2 **需要最低API level 21，即需要Android 5.0以上，且国内很多厂商对这个接口的支持并不好，因此暂不考虑（主要内容其实变化不大）
+<p>首先，本文主要以 <strong>android.hardware.Camera</strong> 包来叙述内容，其实Google官方已经把其作为Deprecated的了，但由于新的包 **android.hardware.camera2 **需要最低API level 21，即需要Android 5.0以上，且国内很多厂商对这个接口的支持并不好，因此暂不考虑（主要内容其实变化不大）<br>
 有兴趣的同学，可以看 <a href="https://github.com/google/cameraview">https://github.com/google/cameraview</a> ，Google提供的一个CameraView，可以自动判断使用哪个API~</p>
 <h2 id="开发流程">开发流程</h2>
-<p><a href="https://developer.android.com/reference/android/hardware/Camera.html">https://developer.android.com/reference/android/hardware/Camera.html</a>
+<p><a href="https://developer.android.com/reference/android/hardware/Camera.html">https://developer.android.com/reference/android/hardware/Camera.html</a><br>
 官方引导文档如上，大致开发流程可以按照上述文档来，本文主要内容讲拍照相关，摄像相关暂不涉猎。</p>
 <h3 id="api选择">API选择</h3>
-<p><img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fmcn3b6mrjj30k20agmxb.jpg" alt="">
+<p><img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fmcn3b6mrjj30k20agmxb.jpg" alt="" loading="lazy"><br>
 首先先要进行API选择，Google共提供两种控制摄像头的API，新的API是Camera2... 但是点评美团的minSdk是16，估计短期内都无法升到21，因此使用Camera1进行，当然也可以直接使用google的这个CameraView，根据SDK VERSION使用不同的API。</p>
 <pre><code class="language-kotlin">if (Build.VERSION.SDK_INT &lt; 21) {            
 		mImpl = new Camera1(mCallbacks, preview);        
@@ -152,7 +152,7 @@ mCamera = Camera.open(mCameraId);
 mCamera.setPreviewDisplay(mSurfaceView.getHolder());
 mCamera.startPreview();
 </code></pre>
-<p>摄像头可以有多个（前置 &amp; 后置），根据需求选择相应的摄像头，并通过open(cameraId)方法获取并打开相应摄像头（默认不传参打开后置，但很怕有特的手机 or Rom默认前置摄像头的...）
+<p>摄像头可以有多个（前置 &amp; 后置），根据需求选择相应的摄像头，并通过open(cameraId)方法获取并打开相应摄像头（默认不传参打开后置，但很怕有特的手机 or Rom默认前置摄像头的...）<br>
 对于使用SurfaceView承载预览数据的，通过使用setPreviewDisplay方法，设置预览所用的内容，这时通过startPreview就会发现，SurfaceView的部分会展示摄像头的内容了~</p>
 <h3 id="camera参数配置">Camera参数配置</h3>
 <p>如果你是直接按照上述代码开发，有很大概率你会踩到深坑~ 主要以下N个（一个个都是泪啊）：</p>
@@ -283,7 +283,7 @@ parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://hakuless.github.io//post/anko-layout">
+            <a class="purple-link" href="https://hakuless.github.io/post/anko-layout">
               <h3 class="post-title">
                 下一篇：Anko Layout
               </h3>

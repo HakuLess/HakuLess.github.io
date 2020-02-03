@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1562294380249">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1580701833955">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
@@ -29,7 +29,7 @@
   <div class="site-header">
     <div class="left">
       <a href="https://hakuless.github.io/">
-        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1562294380249" alt="" width="32px" height="32px">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1580701833955" alt="" width="32px" height="32px">
       </a>
       <a href="https://hakuless.github.io/">
         <h1 class="site-title">HaKuLess</h1>
@@ -86,14 +86,14 @@
               <span>
                 <i class="icon-pricetags-outline"></i>
                 
-                  <a href="https://hakuless.github.io//tag/tech">
+                  <a href="https://hakuless.github.io/tag/tech">
                     Tech
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/android">
+                  <a href="https://hakuless.github.io/tag/android">
                     Android
                     
                   </a>
@@ -144,7 +144,7 @@
 <ul>
 <li>
 <p>在BiliBili官网下载<a href="http://app.bilibili.com/">官方apk</a></p>
-<p>![下载Android版BiliBili](https://github.com/HakuLess/ImageLib/blob/master/blog/apk%E4%B8%8B%E8%BD%BD%E9%80%89%E6%8B%A9.png?raw=true =200x200)</p>
+<figure data-type="image" tabindex="1"><img src="https://github.com/HakuLess/ImageLib/blob/master/blog/apk%E4%B8%8B%E8%BD%BD%E9%80%89%E6%8B%A9.png?raw=true" alt="下载Android版BiliBili" width="200" height="200" loading="lazy"></figure>
 </li>
 <li>
 <p>使用 apktool 和 dex2jar 反编译apk文件。</p>
@@ -152,13 +152,13 @@
   
   ./d2j-dex2jar.sh /Users/HaKu/Downloads/app-debug.apk
 </code></pre>
-<p>![进行反编译](https://github.com/HakuLess/ImageLib/blob/master/blog/apktool.png?raw=true =400x150)</p>
+<figure data-type="image" tabindex="2"><img src="https://github.com/HakuLess/ImageLib/blob/master/blog/apktool.png?raw=true" alt="进行反编译" width="400" height="150" loading="lazy"></figure>
 </li>
 <li>
 <p>使用 JD-GUI 和 IDA 分析代码</p>
-<p>![通过GUI查看代码](https://github.com/HakuLess/ImageLib/blob/master/blog/gui.png?raw=true =600x300)
+<p><img src="https://github.com/HakuLess/ImageLib/blob/master/blog/gui.png?raw=true" alt="通过GUI查看代码" width="600" height="300" loading="lazy"><br>
 通过查找GUI可以看出关于appsecret部分B站APP并没有直接写入在java代码中，而是在bili的so库中，也算是对代码的一种保护，因此需要继续下去使用IDA分析so库的内容。</p>
-<p>![通过IDA查看汇编代码](https://github.com/HakuLess/ImageLib/blob/master/blog/ida_biliso.jpeg?raw=true =600x300)
+<p><img src="https://github.com/HakuLess/ImageLib/blob/master/blog/ida_biliso.jpeg?raw=true" alt="通过IDA查看汇编代码" width="600" height="300" loading="lazy"><br>
 此处红框包围的代码即APP调用so方法获取appsecret的地方，这里把具体内容隐藏，有兴趣的朋友可以直接自己操作一遍获取内容。</p>
 </li>
 </ul>

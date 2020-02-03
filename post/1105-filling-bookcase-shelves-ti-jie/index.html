@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1562294380249">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1580701833955">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
@@ -29,7 +29,7 @@
   <div class="site-header">
     <div class="left">
       <a href="https://hakuless.github.io/">
-        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1562294380249" alt="" width="32px" height="32px">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1580701833955" alt="" width="32px" height="32px">
       </a>
       <a href="https://hakuless.github.io/">
         <h1 class="site-title">HaKuLess</h1>
@@ -86,28 +86,28 @@
               <span>
                 <i class="icon-pricetags-outline"></i>
                 
-                  <a href="https://hakuless.github.io//tag/f92VwjICi">
+                  <a href="https://hakuless.github.io/tag/f92VwjICi">
                     DP
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/IljgdPijv">
+                  <a href="https://hakuless.github.io/tag/IljgdPijv">
                     LeetCode
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/kXyJVahYw">
+                  <a href="https://hakuless.github.io/tag/kXyJVahYw">
                     Algorithm
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/tech">
+                  <a href="https://hakuless.github.io/tag/tech">
                     Tech
                     
                   </a>
@@ -116,21 +116,21 @@
             
           </div>
           <div class="post-content">
-            <p>本周状态不错，可惜好几周没有DP的题，一下卡住了...
+            <p>本周状态不错，可惜好几周没有DP的题，一下卡住了...<br>
 <a href="https://leetcode.com/problems/filling-bookcase-shelves/">https://leetcode.com/problems/filling-bookcase-shelves/</a></p>
 <!-- more -->
 <h3 id="题目大意">题目大意</h3>
-<p>给出一组书，书有宽、高，架子也有宽度，按照顺序从上向下摆放，问架子至少需要多高才能把书都放完，如下图所示：
-<img src="https://hakuless.github.io//post-images/1562138680833.png" alt="">
+<p>给出一组书，书有宽、高，架子也有宽度，按照顺序从上向下摆放，问架子至少需要多高才能把书都放完，如下图所示：<br>
+<img src="https://hakuless.github.io//post-images/1562138680833.png" alt="" loading="lazy"><br>
 这里需要注意</p>
 <ol>
 <li>书是按顺序放的，所以4、5、6无法放到1的右侧，不属于贪心</li>
 <li>换行策略，如2可以放在1的右侧，但是3就要另起一行，相对占用高度会更大</li>
 </ol>
 <h3 id="题解">题解</h3>
-<p>使用动态规划求解这类 <strong>中间状态</strong> &amp;&amp; <strong>下一个输入</strong> 确定 <strong>下一个状态</strong> 的问题
-本题中，如果没有7的输入，那么高度会是5，而成为6原因是前6个输入的结果
-第7本书可以独立一行，or 与前边连续的n本书一起一行（n从0到6，总体宽度不可以大于架子宽度）
+<p>使用动态规划求解这类 <strong>中间状态</strong> &amp;&amp; <strong>下一个输入</strong> 确定 <strong>下一个状态</strong> 的问题<br>
+本题中，如果没有7的输入，那么高度会是5，而成为6原因是前6个输入的结果<br>
+第7本书可以独立一行，or 与前边连续的n本书一起一行（n从0到6，总体宽度不可以大于架子宽度）<br>
 那么 前6本书的最小高度也可以依照该逻辑求出，即每个状态下的最小高度，最后得出动态方程为</p>
 <pre><code>// n从0取到K-1，直到它们总宽度大于架子宽度
 dp[k] = minOf[dp[k], dp[k-n] + max[height{k-n..k}]]
@@ -160,7 +160,7 @@ dp[k] = minOf[dp[k], dp[k-n] + max[height{k-n..k}]]
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://hakuless.github.io//post/union-find-set">
+            <a class="purple-link" href="https://hakuless.github.io/post/union-find-set">
               <h3 class="post-title">
                 下一篇：Union-Find Set
               </h3>

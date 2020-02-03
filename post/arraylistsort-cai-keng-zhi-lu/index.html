@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1562294380249">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1580701833955">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
@@ -29,7 +29,7 @@
   <div class="site-header">
     <div class="left">
       <a href="https://hakuless.github.io/">
-        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1562294380249" alt="" width="32px" height="32px">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1580701833955" alt="" width="32px" height="32px">
       </a>
       <a href="https://hakuless.github.io/">
         <h1 class="site-title">HaKuLess</h1>
@@ -86,14 +86,14 @@
               <span>
                 <i class="icon-pricetags-outline"></i>
                 
-                  <a href="https://hakuless.github.io//tag/tech">
+                  <a href="https://hakuless.github.io/tag/tech">
                     Tech
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/android">
+                  <a href="https://hakuless.github.io/tag/android">
                     Android
                     
                   </a>
@@ -137,7 +137,7 @@
 </code></pre>
 <p>直觉上，对于不关注的属性排序顺序无所谓，就在最后的 else 全部给了 return 1，对于一些数据会爆出crash：java.lang.IllegalArgumentException: Comparison method violates its general contract!</p>
 <h2 id="解决">解决</h2>
-<p>查询定位问题产生原因 &amp; 解决问题比较容易，直接查Google也能发现这个Crash Log的含义是Compare自己违反了自己的约定，即排序自身出现了冲突，产生了如 C &gt; A &gt; B &gt; C 这样的结果，显然这种是明显的异常。
+<p>查询定位问题产生原因 &amp; 解决问题比较容易，直接查Google也能发现这个Crash Log的含义是Compare自己违反了自己的约定，即排序自身出现了冲突，产生了如 C &gt; A &gt; B &gt; C 这样的结果，显然这种是明显的异常。<br>
 修复方案也十分的简单，只要对于不关心的属性return 0即可，即认为值相等，对于上述核心内容修改如下：</p>
 <pre><code class="language-Java">// sort by three dimensions, can be selected, value &amp; end time
 if (canSelect1 &amp;&amp; !canSelect2) {
@@ -213,47 +213,47 @@ if (canSelect1 &amp;&amp; !canSelect2) {
     assert ts.stackSize == 1;
 }
 </code></pre>
-<p>看一下TimSort的sort方法，排序长度小于1的直接返回，无需排序，对于长度小于MIN_MERGE（当前环境为32），先用countRunAndMakeAscending预处理，然后用二分查找插入排序，这个过程中两个数只会比较一次，并不会引发上述crash的内容，因此目标应该是在后面，对于大量数据拆分。
-其实通过crash log也能定位到，这个异常是在TimSort的 mergeLo &amp; mergeHi 方法中抛出，如下图：	<img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fq5grlrdc1j318u04q759.jpg" alt=""></p>
+<p>看一下TimSort的sort方法，排序长度小于1的直接返回，无需排序，对于长度小于MIN_MERGE（当前环境为32），先用countRunAndMakeAscending预处理，然后用二分查找插入排序，这个过程中两个数只会比较一次，并不会引发上述crash的内容，因此目标应该是在后面，对于大量数据拆分。<br>
+其实通过crash log也能定位到，这个异常是在TimSort的 mergeLo &amp; mergeHi 方法中抛出，如下图：	<img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fq5grlrdc1j318u04q759.jpg" alt="" loading="lazy"></p>
 <h3 id="算法流程">算法流程</h3>
 <h4 id="countrunandmakeascending">countRunAndMakeAscending</h4>
-<p>首先，通过countRunAndMakeAscending方法，将整个数组变为划分为多个升序 or 降序的片段，每个片段是一个Run，对于降序的将其通过reverseRange将其转换为升序，核心代码如下图：<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq5h2udmcrj319i0au76s.jpg" alt="">
-如：{1, 3, 2, 10, 5, 4, 1} 会发生3次分片
+<p>首先，通过countRunAndMakeAscending方法，将整个数组变为划分为多个升序 or 降序的片段，每个片段是一个Run，对于降序的将其通过reverseRange将其转换为升序，核心代码如下图：<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq5h2udmcrj319i0au76s.jpg" alt="" loading="lazy"><br>
+如：{1, 3, 2, 10, 5, 4, 1} 会发生3次分片<br>
 {1, 3}正常升序 {2, 10}正常升序 {1, 4, 5}降序被reverse成为升序</p>
 <h4 id="mergecollapse-mergeforcecollapse">mergeCollapse &amp; mergeForceCollapse</h4>
-<p>将Run放到一个栈结构中，并对相邻的Run进行merge操作。
-先举个最简单的例子，数组123454321的排序流程如下，先分Run片段，再merge。
-{1, 2, 3, 4, 5}
-{1, 2, 3, 4, 5}, {1, 2, 3, 4}
+<p>将Run放到一个栈结构中，并对相邻的Run进行merge操作。<br>
+先举个最简单的例子，数组123454321的排序流程如下，先分Run片段，再merge。<br>
+{1, 2, 3, 4, 5}<br>
+{1, 2, 3, 4, 5}, {1, 2, 3, 4}<br>
 {1, 1, 2, 2, 3, 3, 4, 4, 5}</p>
-<p>问题就发生在这个merge的过程中，首先这个merge过程并不是入个栈就merge的，它有个条件如下图：
-<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq5ifn2e30j313a0fw0v0.jpg" alt=""></p>
+<p>问题就发生在这个merge的过程中，首先这个merge过程并不是入个栈就merge的，它有个条件如下图：<br>
+<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq5ifn2e30j313a0fw0v0.jpg" alt="" loading="lazy"></p>
 <ol>
 <li>只对相邻的区块merge</li>
 <li>若当前区块数 &gt;= 3，If X &lt;= Y + Z，若 X &gt;= Z, 则将 Y 和 Z merge，否则 合并 X 和 Y</li>
 <li>若当前区块数仅为 2，If X&lt;= Y，将 X 和 Y merge</li>
 <li>不满足则等待下一个Run入栈，直到完全没有入栈数据，则用mergeForceCollapse强制merge所有Run（这里仍然有通过长度不同选择顺序的逻辑）</li>
 </ol>
-<p>上述流程如下图所示：
-<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fq9ybsclcwj31cg0jo3zl.jpg" alt="">
+<p>上述流程如下图所示：<br>
+<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fq9ybsclcwj31cg0jo3zl.jpg" alt="" loading="lazy"><br>
 发生问题的核心原因就是在merge的过程中，罪魁祸首在比较顺序的不统一，并不一直是index小的比较index大的，在 mergeHi &amp; mergeLo 中通过计算count的赢点，即要合并的数组中，你有多少比我最小值还小 or 比我最大值还大的。掐头去尾后，再次比较两个cursor，两个cursor都从大到小开始遍历，然后比较寻找插入的位置，然而在寻找这个插入位置时，compare(B[cursor2],A[cursor1])，因此会与compare(A[cursor1],B[cursor2])的结果不一致。</p>
 <h4 id="bug产生详解">bug产生详解</h4>
-<p>详细举例说明：两个数组A、B 分别是{1，3，3，5，7，10} 和 {3，8，12，15}，首先进行掐头去尾，如下图：
-<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fq6enhy0r6j3120054mxa.jpg" alt="">
+<p>详细举例说明：两个数组A、B 分别是{1，3，3，5，7，10} 和 {3，8，12，15}，首先进行掐头去尾，如下图：<br>
+<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fq6enhy0r6j3120054mxa.jpg" alt="" loading="lazy"><br>
 A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，而这里两边3的比较是按照compare(B[0], A[1])比较的，由于代码的错误导致没有比较出相等，而是比较为小于，因此3被保留。正常情况应该应该一直将A中的两个3也掐掉，对于相等的处理是A中的掐头掐掉，B的去尾去掉。下面我们将这两个错误的3标红表示正常情况下不该保留。</p>
 <blockquote>
 <p>注：掐头去尾过程也是二分法比较寻找到需要的offset</p>
 </blockquote>
-<p>让我们继续，下面开始进行merge排序，两个cursor分别指向A、B的尾部，比较后插入。
-<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fq6f4d9z64j30wi0act90.jpg" alt="">
-这个过程中，我们会认为A中最小的元素要大于B中最小的元素（因为掐头的原因），merge的过程中不断的移动cursor1和cursor2直到cursor1到头，然后就可以将B中剩余的元素全部移入A的头部即可完成排序。但是，当比较到两边3的过程时，由于比较顺序的变化，会把B中的3插入到A[2]位置，当cursor1再次移动时，查找B发现B已经空了，这不符合预想“A中最小的元素要大于B中最小的元素”，应该A先空，B后空才正确，因此JDK中主动throw了我们遇到的Exception。
-<img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq6fmu2w7zj31060eswfh.jpg" alt="">
+<p>让我们继续，下面开始进行merge排序，两个cursor分别指向A、B的尾部，比较后插入。<br>
+<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fq6f4d9z64j30wi0act90.jpg" alt="" loading="lazy"><br>
+这个过程中，我们会认为A中最小的元素要大于B中最小的元素（因为掐头的原因），merge的过程中不断的移动cursor1和cursor2直到cursor1到头，然后就可以将B中剩余的元素全部移入A的头部即可完成排序。但是，当比较到两边3的过程时，由于比较顺序的变化，会把B中的3插入到A[2]位置，当cursor1再次移动时，查找B发现B已经空了，这不符合预想“A中最小的元素要大于B中最小的元素”，应该A先空，B后空才正确，因此JDK中主动throw了我们遇到的Exception。<br>
+<img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq6fmu2w7zj31060eswfh.jpg" alt="" loading="lazy"><br>
 由于compare的错误写法，导致A的cursor未遍历到头部就完成了merge，B中的元素全部被插入到A里了，这与开始的<strong>掐头去尾</strong>有明显的冲突，最后应该剩余1个or多个元素，再一起copy到A的头部才是正常的结果。</p>
 <p>一顿凌乱的JDK代码，最后因优化减少比较次数，发生了这个问题，具体代码实在太乱了... JDK的还不好调试... 最后还是要感谢前辈们踩的坑，不然这个问题细节的研究还会多花一些时间...</p>
-<p>最终结论，并不是只要有相等的元素就会crash，而是对分Run片有一定要求，需要比较顺序发生不一致的场景才有可能发生。
-<img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq5k488ttkj315o040gmh.jpg" alt=""></p>
+<p>最终结论，并不是只要有相等的元素就会crash，而是对分Run片有一定要求，需要比较顺序发生不一致的场景才有可能发生。<br>
+<img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq5k488ttkj315o040gmh.jpg" alt="" loading="lazy"></p>
 <h4 id="crash数据">Crash数据</h4>
-<p>数组：{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-2,1,0,-2,0,0,0,0};
+<p>数组：{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-2,1,0,-2,0,0,0,0};<br>
 排序接口实现：</p>
 <pre><code class="language-Java">if (o1 &gt; o2) {
     1
@@ -262,7 +262,7 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 }
 </code></pre>
 <h2 id="thanks-to">Thanks to</h2>
-<p><a href="http://blog.2baxb.me/archives/993">图解JDK7的Comparison method violates its general contract异常</a>
+<p><a href="http://blog.2baxb.me/archives/993">图解JDK7的Comparison method violates its general contract异常</a><br>
 <a href="https://blog.csdn.net/shadow_zed/article/details/72758912">crash数据</a></p>
 
           </div>
@@ -270,7 +270,7 @@ A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，�
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://hakuless.github.io//post/2017-nian-zhong-zong-jie">
+            <a class="purple-link" href="https://hakuless.github.io/post/2017-nian-zhong-zong-jie">
               <h3 class="post-title">
                 下一篇：2017年终总结
               </h3>

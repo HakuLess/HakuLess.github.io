@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1562294380249">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1580701833955">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
@@ -29,7 +29,7 @@
   <div class="site-header">
     <div class="left">
       <a href="https://hakuless.github.io/">
-        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1562294380249" alt="" width="32px" height="32px">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1580701833955" alt="" width="32px" height="32px">
       </a>
       <a href="https://hakuless.github.io/">
         <h1 class="site-title">HaKuLess</h1>
@@ -89,28 +89,28 @@
               <span>
                 <i class="icon-pricetags-outline"></i>
                 
-                  <a href="https://hakuless.github.io//tag/IljgdPijv">
+                  <a href="https://hakuless.github.io/tag/IljgdPijv">
                     LeetCode
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/B6a_MNeCC">
+                  <a href="https://hakuless.github.io/tag/B6a_MNeCC">
                     Data Structure
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/kXyJVahYw">
+                  <a href="https://hakuless.github.io/tag/kXyJVahYw">
                     Algorithm
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/tech">
+                  <a href="https://hakuless.github.io/tag/tech">
                     Tech
                     
                   </a>
@@ -148,20 +148,20 @@
 <li>union(x, y)过程，会根据 ranks值进行比较，然后merge方式不同</li>
 </ol>
 <h3 id="path-compression">Path Compression</h3>
-<p>首先，find寻找过程中同时进行 <strong>path compression</strong> 优化，如建立关联关系时，整个关联图的关系非常的长，如下图：
-<img src="https://hakuless.github.io//post-images/1558768567180.png" alt="">
-当我们要查找1所在组时，会一直遍历到链表头，会非常耗时，因此需要在find过程中进行优化，把1、2、3、5（查找的数据及其所有祖先）均直接指向8（Class ID），拉平我们的树结构（flatten the structure），变成如下图所示：
-<img src="https://hakuless.github.io//post-images/1558768774411.png" alt="">
+<p>首先，find寻找过程中同时进行 <strong>path compression</strong> 优化，如建立关联关系时，整个关联图的关系非常的长，如下图：<br>
+<img src="https://hakuless.github.io//post-images/1558768567180.png" alt="" loading="lazy"><br>
+当我们要查找1所在组时，会一直遍历到链表头，会非常耗时，因此需要在find过程中进行优化，把1、2、3、5（查找的数据及其所有祖先）均直接指向8（Class ID），拉平我们的树结构（flatten the structure），变成如下图所示：<br>
+<img src="https://hakuless.github.io//post-images/1558768774411.png" alt="" loading="lazy"><br>
 这时候我们再次查找时，会大大减少遍历所需时间</p>
 <h3 id="union-by-rank">Union By Rank</h3>
-<p>合并的过程，我们通过Union By Rank来进行优化，原理与上述内容类似，就是为了减少我们查找过程中的耗时。由于我们的merge过程就是把一个组的根节点直接指向另一个组的根节点，那么如果把一个很复杂的结构+到一个简单结构上，会增加整个树的深度，反之则不会增大复杂度。因此我们尽量让深度小的树 attach 到深度大的树上，效果如下图：
-<img src="https://hakuless.github.io//post-images/1558769263768.png" alt="两组进行合并">
-<img src="https://hakuless.github.io//post-images/1558769351883.png" alt="小树attach大树">
-<img src="https://hakuless.github.io//post-images/1558769433973.png" alt="大树attach小树">
+<p>合并的过程，我们通过Union By Rank来进行优化，原理与上述内容类似，就是为了减少我们查找过程中的耗时。由于我们的merge过程就是把一个组的根节点直接指向另一个组的根节点，那么如果把一个很复杂的结构+到一个简单结构上，会增加整个树的深度，反之则不会增大复杂度。因此我们尽量让深度小的树 attach 到深度大的树上，效果如下图：<br>
+<img src="https://hakuless.github.io//post-images/1558769263768.png" alt="两组进行合并" loading="lazy"><br>
+<img src="https://hakuless.github.io//post-images/1558769351883.png" alt="小树attach大树" loading="lazy"><br>
+<img src="https://hakuless.github.io//post-images/1558769433973.png" alt="大树attach小树" loading="lazy"><br>
 可以明显看出，当大树attach小树时，复杂度明显增加，通过一个rank数组记录每一次做深节点的操作（Rank值相同的合并），并用于判断以后的union操作</p>
 <h2 id="leetcode">LeetCode</h2>
 <h3 id="684-redundant-connection">684. Redundant Connection</h3>
-<p>标准的并查集题目，给出一组无向图的边，找到第一个使无相同中产生环的边 =&gt;
+<p>标准的并查集题目，给出一组无向图的边，找到第一个使无相同中产生环的边 =&gt;<br>
 转化为 将给出的边，按顺序把所有的点进行分组，直到发现某条边在添加之前，边的两个点就已经在一组里了，那么此时若加入这条边，即会产生环。</p>
 <pre><code>class Solution {
     fun findRedundantConnection(edges: Array&lt;IntArray&gt;): IntArray {
@@ -203,7 +203,7 @@
 </code></pre>
 <p>这里将所有的关系，录入到并查集中，然后遍历所有的学生所属的组放到Set里，那么Set的长度就是朋友圈的数量</p>
 <h3 id="947-most-stones-removed-with-same-row-or-column">947. Most Stones Removed with Same Row or Column</h3>
-<p>一般并查集的微变形，一个二维棋盘上，散落着一堆石头（每个石头一个点 且 不会有重复），然后我们可以一次一个的取下石头（对石头有要求，需要有其他石头和取下的石头在同一行 or 同一列，即自己单独一行 &amp; 一列 的石头无法取下，天煞孤石）
+<p>一般并查集的微变形，一个二维棋盘上，散落着一堆石头（每个石头一个点 且 不会有重复），然后我们可以一次一个的取下石头（对石头有要求，需要有其他石头和取下的石头在同一行 or 同一列，即自己单独一行 &amp; 一列 的石头无法取下，天煞孤石）<br>
 这里，一组的属性是 行数 or 列数相同，Solution里给出的方案是根据 <strong>Note</strong> 中入参的限制来把 <em>列</em> 转换为 10000+的 <em>行</em> 数，我们这里采用更通用的办法，通过一个Map转换我们的Class ID与数据（ID与属性不需要有强关系）</p>
 <pre><code>class Solution {
     fun removeStones(stones: Array&lt;IntArray&gt;): Int {
@@ -275,7 +275,7 @@ class TypedUFS&lt;T&gt;(var n: Int = 0) {
 </code></pre>
 <p>把行、列有相同情况的元素union在一起，每个组都会留下一个元素，因此我们能有拿走的石头的最大数量就是 石头的数量 减去 并查集组的数量（与之前朋友圈的题目相似）。这里我们使用了一个 <strong>TypedUFS</strong> 来处理非int类型的源数据，map每次分配一个新元素一个新的Key值，最大程度的减少 <strong>parent</strong> 与 <strong>rank</strong> 数组的长度（最大只需要数据源的长度，而非数据源的范围，与Solution的区别）</p>
 <h2 id="参考资料">参考资料</h2>
-<p><a href="https://zxi.mytechroad.com/blog/data-structure/sp1-union-find-set/">花花LeetCode</a>
+<p><a href="https://zxi.mytechroad.com/blog/data-structure/sp1-union-find-set/">花花LeetCode</a><br>
 <a href="https://en.wikipedia.org/wiki/Disjoint-set_data_structure">wiki</a></p>
 
           </div>
@@ -283,7 +283,7 @@ class TypedUFS&lt;T&gt;(var n: Int = 0) {
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://hakuless.github.io//post/binary-search">
+            <a class="purple-link" href="https://hakuless.github.io/post/binary-search">
               <h3 class="post-title">
                 下一篇：Binary Search
               </h3>

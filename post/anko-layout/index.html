@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1562294380249">
+<link rel="shortcut icon" href="https://hakuless.github.io//favicon.ico?v=1580701833955">
 <link rel="stylesheet" href="https://hakuless.github.io//styles/main.css">
 
 
@@ -29,7 +29,7 @@
   <div class="site-header">
     <div class="left">
       <a href="https://hakuless.github.io/">
-        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1562294380249" alt="" width="32px" height="32px">
+        <img class="avatar" src="https://hakuless.github.io//images/avatar.png?v=1580701833955" alt="" width="32px" height="32px">
       </a>
       <a href="https://hakuless.github.io/">
         <h1 class="site-title">HaKuLess</h1>
@@ -86,21 +86,21 @@
               <span>
                 <i class="icon-pricetags-outline"></i>
                 
-                  <a href="https://hakuless.github.io//tag/gEjrhrmNK">
+                  <a href="https://hakuless.github.io/tag/gEjrhrmNK">
                     Kotlin
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/tech">
+                  <a href="https://hakuless.github.io/tag/tech">
                     Tech
                     
                       ，
                     
                   </a>
                 
-                  <a href="https://hakuless.github.io//tag/android">
+                  <a href="https://hakuless.github.io/tag/android">
                     Android
                     
                   </a>
@@ -109,7 +109,7 @@
             
           </div>
           <div class="post-content">
-            <p><a href="https://github.com/Kotlin/anko/wiki/Anko-Layouts#why-anko-layouts">github说明</a>
+            <p><a href="https://github.com/Kotlin/anko/wiki/Anko-Layouts#why-anko-layouts">github说明</a><br>
 Kotlin支持的一种新的，以DSL方式并通过Kotlin代码组件UI的功能。可以让RD完全抛弃使用xml写layout，节约开发时间，规避许多潜在bug</p>
 <!--more-->
 <h3 id="使用demo">使用Demo</h3>
@@ -144,7 +144,7 @@ Kotlin支持的一种新的，以DSL方式并通过Kotlin代码组件UI的功能
 }
 
 </code></pre>
-<p>一步一步来看，最外层scrollView表示根布局是个ScrollView，与xml不同，可以省略width &amp; height的填写，默认为wrap_content，整体结构与layout.xml的写法相似，使用DSL方式表示各个View的从属关系。
+<p>一步一步来看，最外层scrollView表示根布局是个ScrollView，与xml不同，可以省略width &amp; height的填写，默认为wrap_content，整体结构与layout.xml的写法相似，使用DSL方式表示各个View的从属关系。<br>
 每个View的属性赋值可以在三个地方操作：</p>
 <ul>
 <li>layoutParams可以通过最后的lparams方法设置（如width、height、weight &amp; gravity）xml中layout_前缀的属性，包括margin、gravity等</li>
@@ -166,18 +166,18 @@ Kotlin支持的一种新的，以DSL方式并通过Kotlin代码组件UI的功能
 <h3 id="缺点">缺点</h3>
 <ul>
 <li>RelativeLayout及一些其他依赖id的Layout与R文件直接增加的 @+id不同，Anko Layout需要自己设置id的值，即人工保证id的唯一性所有需要人来保障的都是不可靠的...</li>
-<li>Preview功能，通过xml写Layout时可以通过AS的Preview功能在无需build的情况下就可以查看布局的效果，并可以通过配合tools来查看填写不同参数时的效果，如文案一行、多行、省略号等然而目前Anko Layout的Preview仅支持Android Studio 2.4+（3.0上不好使...）目前Plugin版本号为Anko Support 0.10.2，Android Studio版本号为Android Studio 3.0 beta7<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fl8cxm27odj30qq0w0weu.jpg" alt=""></li>
+<li>Preview功能，通过xml写Layout时可以通过AS的Preview功能在无需build的情况下就可以查看布局的效果，并可以通过配合tools来查看填写不同参数时的效果，如文案一行、多行、省略号等然而目前Anko Layout的Preview仅支持Android Studio 2.4+（3.0上不好使...）目前Plugin版本号为Anko Support 0.10.2，Android Studio版本号为Android Studio 3.0 beta7<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fl8cxm27odj30qq0w0weu.jpg" alt="" loading="lazy"></li>
 </ul>
 <h2 id="原理">原理</h2>
-<p>首先，通过⌃+⌘+K快捷键可以调用Kotlin Byecode，对于JVM来讲，Kotlin和Java没有区别，甚至二者可以任意的互相转换、调用~
+<p>首先，通过⌃+⌘+K快捷键可以调用Kotlin Byecode，对于JVM来讲，Kotlin和Java没有区别，甚至二者可以任意的互相转换、调用~<br>
 以一个简单的Demo，让我们一起来探索下通过DSL书写布局的秘密！</p>
 <h3 id="代码准备">代码准备</h3>
 <pre><code class="language-kotlin">inline fun ViewManager.verticalLayout(theme: Int = 0, init: _LinearLayout.() -&gt; Unit): LinearLayout {
     return ankoView(`$$Anko$Factories$CustomViews`.VERTICAL_LAYOUT_FACTORY, theme, init)
 }
 </code></pre>
-<p>上述代码，verticalLayout方法支持2个参数，其中第一个参数是默认值，第二个参数是一个方法（高阶函数以方法作为参数），方法的输入是一个返回值为空的方法（结合Lambda表达式）
-<strong>init: _LinearLayout.() -&gt; Unit</strong>
+<p>上述代码，verticalLayout方法支持2个参数，其中第一个参数是默认值，第二个参数是一个方法（高阶函数以方法作为参数），方法的输入是一个返回值为空的方法（结合Lambda表达式）<br>
+<strong>init: _LinearLayout.() -&gt; Unit</strong><br>
 这里是相当于执行_LinearLayout中的空方法，之后在 **{ } **所写的具体View代码相当于执行LinearLayout的相应方法，可看下文一个简单代码示例：</p>
 <pre><code class="language-kotlin">val represents: String.(Int) -&gt; Boolean = { other -&gt; toIntOrNull() == other }
 println(&quot;123&quot;.represents(123)) // true
@@ -201,12 +201,12 @@ class MyActivityUI : AnkoComponent&lt;MyActivity&gt; {
     }.view
 }
 </code></pre>
-<p>上述布局很简单，就是一个垂直的LinearLayout中，第一行是一个EditText，第二行是一个Button，并且点击Btn的时候会弹出Toast，其中的内容是用户在editText中输入的数据的一个拼装
-但是这个Layout是如何进入contentView的呢？
+<p>上述布局很简单，就是一个垂直的LinearLayout中，第一行是一个EditText，第二行是一个Button，并且点击Btn的时候会弹出Toast，其中的内容是用户在editText中输入的数据的一个拼装<br>
+但是这个Layout是如何进入contentView的呢？<br>
 如果正常只通过Java代码来写这个功能的代码，就是自己new一大堆View，然后通过addView一点一点的组进去，Anko Layout是如何模仿这一过程的呢？</p>
 <ul>
-<li>通过⌃+⌘+K快捷键打开Bytecode的面板（代码可读性还是比较低的... 用行内的话就是，观影体验极差）<img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fl8e0r9d8zj31kw0umacd.jpg" alt=""></li>
-<li>通过点击Bytecode面板中的Decompile将其反编译为Java code<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fl8e4w487gj31kw0t677s.jpg" alt="">对于两种DSL使用方法略有不同，一种是直接在onCreate中写DSL代码，另一种是通过一个外部类继承AnkoComponent，并复写其中的createView方法。两种没有本质上的区别，本Demo以第二种来进行说明（算是包括了第一种，只是通过AnkoComponent转了一层，加强Layout的复用功能）</li>
+<li>通过⌃+⌘+K快捷键打开Bytecode的面板（代码可读性还是比较低的... 用行内的话就是，观影体验极差）<img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fl8e0r9d8zj31kw0umacd.jpg" alt="" loading="lazy"></li>
+<li>通过点击Bytecode面板中的Decompile将其反编译为Java code<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fl8e4w487gj31kw0t677s.jpg" alt="" loading="lazy">对于两种DSL使用方法略有不同，一种是直接在onCreate中写DSL代码，另一种是通过一个外部类继承AnkoComponent，并复写其中的createView方法。两种没有本质上的区别，本Demo以第二种来进行说明（算是包括了第一种，只是通过AnkoComponent转了一层，加强Layout的复用功能）</li>
 <li>入口方法为 <strong>MyActivityUI().setContentView(this)</strong> 其中setContentView为AnkoComponent的一个扩展，在内部方法中返回实现的AnkoComponent中createView方法创造的View。而 <strong>ui.apply</strong> 方法使其作用域内部任意调用ui的方法，即我们所写的DSL风格的代码其实一样是一个一个的方法，只是省略掉的调用的实例，使其外貌上看上去像是xml写的layout~</li>
 <li>ui的类型为 <strong>interface AnkoContext<out T> : ViewManager</strong> kotlin的interface与java的不同，可以持有变量 并且 方法允许有默认的实现（靠近虚类），其中泛型的in &amp; out也与Java的 T extends 与 super类似，定制所需类型的上界下界，通过in、out方式更直观的通过该类型是输入类型 or 输出类型来判断，更符合人的直观感受🙃通过扩展ViewManager的方法，加入了verticalLayout等一系列Layout的实现，实现了添加View的方法！</li>
 <li>通过ankoView生成相应的View，比如verticalLayout生成LinearLayout在CustomViews.kt文件中，代码如下</li>
@@ -220,7 +220,7 @@ class MyActivityUI : AnkoComponent&lt;MyActivity&gt; {
 <li>接下来又是一大长串，我还是代码+图片来阐述吧... 这个用文字要打太多了，估计你也看不下去😂AnkoInternals.addView -&gt; createAnkoContext -&gt; AnkoContextImpl -&gt; addView -&gt; doAddView每一个DSL风格的域经过一轮解析创建好View之后并在之后add进其上下文，同时判断其上下文如果是Activity则setContentView作为根节点（对于内部View则是判断ViewManager是ViewGroup or AnkoContext） 通过这种方式实现，普通的onCreate中的直接使用viewGroup &amp; 自定义UI继承AnkoComponent 两种方案。</li>
 </ul>
 <h3 id="整体时序图">整体时序图</h3>
-<p><img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fl8m3hvgraj31h80u03zm.jpg" alt="">
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fl8m3hvgraj31h80u03zm.jpg" alt="" loading="lazy"><br>
 如上述时序图所示，View的创建一层一层的传递下去，其中共有三种情况，即创建View的三种上下文：</p>
 <ul>
 <li>Activity，在Activity的onCreate中调用，判断到最后通过setContentView来填充整个布局</li>
@@ -238,7 +238,7 @@ class MyActivityUI : AnkoComponent&lt;MyActivity&gt; {
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://hakuless.github.io//post/freeline-da-bao-liu-cheng-chu-tan">
+            <a class="purple-link" href="https://hakuless.github.io/post/freeline-da-bao-liu-cheng-chu-tan">
               <h3 class="post-title">
                 下一篇：Freeline打包流程初探
               </h3>
