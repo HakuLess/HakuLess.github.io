@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://hakuless.github.io/</id>
     <title>HaKuLess</title>
-    <updated>2020-02-10T08:37:16.367Z</updated>
+    <updated>2020-02-19T08:59:06.909Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://hakuless.github.io/"/>
     <link rel="self" href="https://hakuless.github.io/atom.xml"/>
@@ -10,6 +10,108 @@
     <logo>https://hakuless.github.io/images/avatar.png</logo>
     <icon>https://hakuless.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, HaKuLess</rights>
+    <entry>
+        <title type="html"><![CDATA[1340. Jump Game V —— 题解]]></title>
+        <id>https://hakuless.github.io/post/1340-jump-game-v-ti-jie</id>
+        <link href="https://hakuless.github.io/post/1340-jump-game-v-ti-jie">
+        </link>
+        <updated>2020-02-19T08:43:50.000Z</updated>
+        <summary type="html"><![CDATA[<p>Contest 174的Q4，如上文所述，由于在Contest中耗费大量精力去搞Q3的 DFS to BFS结果导致两道题都没搞定... （还是太年轻~）<br>
+Jump Game系列也来到了第五代，这一系列的题目都很经典，覆盖了贪心、BFS、DFS、DP等许多算法，下面让我们一起来看看这个第五代吧</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>Contest 174的Q4，如上文所述，由于在Contest中耗费大量精力去搞Q3的 DFS to BFS结果导致两道题都没搞定... （还是太年轻~）<br>
+Jump Game系列也来到了第五代，这一系列的题目都很经典，覆盖了贪心、BFS、DFS、DP等许多算法，下面让我们一起来看看这个第五代吧</p>
+<!-- more -->
+<h3 id="题目描述">题目描述</h3>
+<p>给定一个整型数组arr和一个整数d，整型数组上的点代表这个点所在的高度，整数d代表人能够移动的最大横向距离。人可以从整型中的任意一个Index出发，到另一个index上，需要满足条件：</p>
+<ol>
+<li>只能在数组范围内移动，即我们的index只能在整型数组的indices中</li>
+<li>单步移动的最大距离只能是d，即从当前移动的范围是[cur-d, cur+d]</li>
+<li>移动目标 及 与当前目标的中间值 都要小于当前值（人只能向下跳，不能向上爬）<br>
+求问，人最多能够移动几次？<br>
+<img src="https://hakuless.github.io//post-images/1582102355985.jpeg" alt="" loading="lazy"><br>
+如上图所述，以下为index值<br>
+在d = 2时，10 -&gt; 8 -&gt; 6 -&gt; 7 因此结果是4<br>
+在d = 3时，2 -&gt; 5 -&gt; 8 -&gt; 6 -&gt; 7 因此结果是5</li>
+</ol>
+<h3 id="题目分析">题目分析</h3>
+<ol>
+<li>某一Index的最优解是一定的，不因其他状态而改变</li>
+<li>同时，当前状态的最优解，可以依赖于附近最多2*d个状态求解<br>
+通过上述条件，可以发现一个精简的解法：DFS + Memo</li>
+</ol>
+<h3 id="解法一dfs-memo">解法一：DFS + Memo</h3>
+<pre><code class="language-Kotlin">fun maxJumps(arr: IntArray, d: Int): Int {
+    // 初始化DP数组，值代表在index位置上的最优解，-1为未求解状态
+    val dp = IntArray(arr.size) { -1 }
+    for (i in 0..arr.lastIndex) {
+        helper(arr, dp, i, d)
+    }
+    return dp.max()!!
+}
+
+private fun helper(arr: IntArray, dp: IntArray, cur: Int, d: Int): Int {
+    // 若已经有值，则直接返回结果，优化子问题
+    if (dp[cur] != -1) {
+        return dp[cur]
+    }
+    // 默认自己为1，仅能站在自己的位置上
+    dp[cur] = 1
+    // 向前跳
+    for (i in cur - 1 downTo cur - d) {
+        if (i !in dp.indices)
+            break
+        // 若中间遇到更高的则停止，无法跳跃
+        if (arr[i] &gt;= arr[cur]) {
+            break
+        }
+        // 查找子问题
+        dp[cur] = maxOf(dp[cur], helper(arr, dp, i, d) + 1)
+    }
+    // 同理向后跳
+    for (i in cur + 1..cur + d) {
+        if (i !in dp.indices)
+            break
+        if (arr[i] &gt;= arr[cur]) {
+            break
+        }
+        dp[cur] = maxOf(dp[cur], helper(arr, dp, i, d) + 1)
+    }
+    return dp[cur]
+}
+</code></pre>
+<h3 id="解法二sort-dp">解法二：Sort + DP</h3>
+<p>DP的动态方程大家比较好想，那就是dp[i] = maxOf(dp[i - d..i + d] + 1)，其中 (i - d) ~ (i + d)需要符合不跨越等高or更高的value，同时要求这些dp值已经是求好的值。<br>
+那么，我们只需要从低到高排序后再去计算就能保障需要用到的值，肯定是已经算好了的，具体代码如下：</p>
+<pre><code class="language-Kotlin">fun maxJumps(arr: IntArray, d: Int): Int {
+    val sort = ArrayList&lt;Pair&lt;Int, Int&gt;&gt;()
+    arr.forEachIndexed { index, i -&gt;
+        sort.add(Pair(index, i))
+    }
+    sort.sortBy { it.second }
+    val dp = IntArray(arr.size) { -1 }
+    sort.forEach {
+        var max = 1
+        for (i in it.first + 1..it.first + d) {
+            if (i !in arr.indices || arr[i] &gt;= it.second) {
+                break
+            }
+            // 由于事先排序，这里的dp[i]可以保证都是有效的正数值
+            max = maxOf(max, 1 + dp[i])
+        }
+        for (i in it.first - 1 downTo it.first - d) {
+            if (i !in arr.indices || arr[i] &gt;= it.second) {
+                break
+            }
+            max = maxOf(max, 1 + dp[i])
+        }
+        dp[it.first] = max
+    }
+    return dp.max()!!
+}
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[1339. Maximum Product of Splitted Binary Tree —— 题解]]></title>
         <id>https://hakuless.github.io/post/1339-maximum-product-of-splitted-binary-tree-ti-jie</id>
@@ -1088,176 +1190,6 @@ boolean DFS(int root, int target) {
     return false;
 }
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[ArrayList.sort踩坑之旅]]></title>
-        <id>https://hakuless.github.io/post/arraylistsort-cai-keng-zhi-lu</id>
-        <link href="https://hakuless.github.io/post/arraylistsort-cai-keng-zhi-lu">
-        </link>
-        <updated>2018-04-09T13:18:21.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="背景">背景</h2>
-<p>相信大家经常会用到各种优惠券，如外卖、打车等场景，而其中优惠券的排序，需要按照多个维度来排序，比如：</p>
-<ol>
-<li>首先按照价格是否满足可用，所有可用的在最前面，不可用的在最后面</li>
-<li>对于可用的优惠券，需要按照券本身的价格排序，越值钱的排序越在前面</li>
-<li>对于价格相同的，需要按照过期时间排序，快过期排在前面</li>
-<li>剩余顺序任意，即可以认为剩余其他属性不影响排序</li>
-</ol>
-<p>根据上述条件，对一个ArrayList进行排序，通过传入一个Comparator来实现，想当然的敲入了下面的代码... 按照价格是否满足可选等上述条件分别返回 -1 和 1。真正按照Comparator接口含义，返回int值含义分为3种，负数、0、正数，分别代表第一个参数小于、等于、大于第二个参数。</p>
-<pre><code class="language-Java">Collections.sort(mCouponInfoList, new Comparator&lt;UserCouponInfo&gt;() {
-    @Override
-    public int compare(UserCouponInfo o1, UserCouponInfo o2) {
-        boolean canSelect1 = o1.priceLimit &lt;= mTotalPrice;
-        boolean canSelect2 = o2.priceLimit &lt;= mTotalPrice;
-
-        // sort by three dimensions, can be selected, value &amp; end time
-        if (canSelect1 &amp;&amp; !canSelect2) {
-            return -1;
-        } else if (canSelect2 &amp;&amp; !canSelect1) {
-            return 1;
-        } else if (o1.value &gt; o2.value) {
-            return -1;
-        } else if (o1.value &lt; o2.value) {
-            return 1;
-        } else if (o1.endTime &lt; o2.endTime) {
-            return -1;
-        } else {
-            // 发生错误的位置 ❌
-            return 1; 
-        }
-    }
-});
-</code></pre>
-<p>直觉上，对于不关注的属性排序顺序无所谓，就在最后的 else 全部给了 return 1，对于一些数据会爆出crash：java.lang.IllegalArgumentException: Comparison method violates its general contract!</p>
-<h2 id="解决">解决</h2>
-<p>查询定位问题产生原因 &amp; 解决问题比较容易，直接查Google也能发现这个Crash Log的含义是Compare自己违反了自己的约定，即排序自身出现了冲突，产生了如 C &gt; A &gt; B &gt; C 这样的结果，显然这种是明显的异常。<br>
-修复方案也十分的简单，只要对于不关心的属性return 0即可，即认为值相等，对于上述核心内容修改如下：</p>
-<pre><code class="language-Java">// sort by three dimensions, can be selected, value &amp; end time
-if (canSelect1 &amp;&amp; !canSelect2) {
-    return -1;
-} else if (canSelect2 &amp;&amp; !canSelect1) {
-    return 1;
-} else if (o1.value &gt; o2.value) {
-    return -1;
-} else if (o1.value &lt; o2.value) {
-    return 1;
-} else if (o1.endTime &lt; o2.endTime) {
-    return -1;
-} else if (o1.endTime &gt; o2.endTime) {
-    return 1;
-} else {
-    return 0;
-}
-</code></pre>
-<p>这样对于相等的元素，不会再有模棱两可问题，若是类似于上述数据源，则会得出数据 C = A = B = C，不会发生错误。</p>
-<h2 id="原因">原因</h2>
-<p>下面重头戏来了，让我们一起在源码的海洋里面探究下到底是什么样的执行过程 &amp; 数据源导致的这个问题！</p>
-<blockquote>
-<p>遇到问题不能浅尝辄止，深入探究，改变以往的作风！</p>
-</blockquote>
-<p>以下源码分析均基于Android SDK 26，不同版本可能会有些不一样，请注意~</p>
-<h3 id="方法调用栈">方法调用栈</h3>
-<p>对于API &gt; 25的，方法的实际调用栈是 Collections.sort -&gt; List.sort -&gt; Arrays.sort -&gt; TimSort.sort，看样子罪恶的核心就在这个TimSort中。看源码之前，真的不清楚TimSort是个什么sort，通过查看网上文章 &amp; 源码才知道，TimSort是 归并排序（mergeSort）&amp; 插入排序（Insert）的一种混合使用，关于其详细含义不在这里赘述。</p>
-<pre><code class="language-Java">static&lt;T&gt; void sort(T[] a, int lo, int hi, Comparator&lt;? super T&gt; c, 
-                    T[] work, int workBase, int workLen) {
-    assert c != null &amp;&amp; a != null &amp;&amp; lo &gt;= 0 &amp;&amp; lo &lt;= hi &amp;&amp; hi &lt;= a.length;
-
-    int nRemaining  = hi - lo;
-    if (nRemaining &lt; 2)
-        return;  // Arrays of size 0 and 1 are always sorted
-
-    // If array is small, do a &quot;mini-TimSort&quot; with no merges
-    if (nRemaining &lt; MIN_MERGE) {
-        int initRunLen = countRunAndMakeAscending(a, lo, hi, c);
-        binarySort(a, lo, hi, lo + initRunLen, c);
-        return;
-    }
-
-    /**
-     * March over the array once, left to right, finding natural runs,
-     * extending short natural runs to minRun elements, and merging runs
-     * to maintain stack invariant.
-     */
-    TimSort&lt;T&gt; ts = new TimSort&lt;&gt;(a, c, work, workBase, workLen);
-    int minRun = minRunLength(nRemaining);
-    do {
-        // Identify next run
-        int runLen = countRunAndMakeAscending(a, lo, hi, c);
-
-        // If run is short, extend to min(minRun, nRemaining)
-        if (runLen &lt; minRun) {
-            int force = nRemaining &lt;= minRun ? nRemaining : minRun;
-            binarySort(a, lo, lo + force, lo + runLen, c);
-            runLen = force;
-        }
-
-        // Push run onto pending-run stack, and maybe merge
-        ts.pushRun(lo, runLen);
-        ts.mergeCollapse();
-
-        // Advance to find next run
-        lo += runLen;
-        nRemaining -= runLen;
-    } while (nRemaining != 0);
-
-    // Merge all remaining runs to complete sort
-    assert lo == hi;
-    ts.mergeForceCollapse();
-    assert ts.stackSize == 1;
-}
-</code></pre>
-<p>看一下TimSort的sort方法，排序长度小于1的直接返回，无需排序，对于长度小于MIN_MERGE（当前环境为32），先用countRunAndMakeAscending预处理，然后用二分查找插入排序，这个过程中两个数只会比较一次，并不会引发上述crash的内容，因此目标应该是在后面，对于大量数据拆分。<br>
-其实通过crash log也能定位到，这个异常是在TimSort的 mergeLo &amp; mergeHi 方法中抛出，如下图：	<img src="https://ws3.sinaimg.cn/large/006tKfTcgy1fq5grlrdc1j318u04q759.jpg" alt="" loading="lazy"></p>
-<h3 id="算法流程">算法流程</h3>
-<h4 id="countrunandmakeascending">countRunAndMakeAscending</h4>
-<p>首先，通过countRunAndMakeAscending方法，将整个数组变为划分为多个升序 or 降序的片段，每个片段是一个Run，对于降序的将其通过reverseRange将其转换为升序，核心代码如下图：<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq5h2udmcrj319i0au76s.jpg" alt="" loading="lazy"><br>
-如：{1, 3, 2, 10, 5, 4, 1} 会发生3次分片<br>
-{1, 3}正常升序 {2, 10}正常升序 {1, 4, 5}降序被reverse成为升序</p>
-<h4 id="mergecollapse-mergeforcecollapse">mergeCollapse &amp; mergeForceCollapse</h4>
-<p>将Run放到一个栈结构中，并对相邻的Run进行merge操作。<br>
-先举个最简单的例子，数组123454321的排序流程如下，先分Run片段，再merge。<br>
-{1, 2, 3, 4, 5}<br>
-{1, 2, 3, 4, 5}, {1, 2, 3, 4}<br>
-{1, 1, 2, 2, 3, 3, 4, 4, 5}</p>
-<p>问题就发生在这个merge的过程中，首先这个merge过程并不是入个栈就merge的，它有个条件如下图：<br>
-<img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fq5ifn2e30j313a0fw0v0.jpg" alt="" loading="lazy"></p>
-<ol>
-<li>只对相邻的区块merge</li>
-<li>若当前区块数 &gt;= 3，If X &lt;= Y + Z，若 X &gt;= Z, 则将 Y 和 Z merge，否则 合并 X 和 Y</li>
-<li>若当前区块数仅为 2，If X&lt;= Y，将 X 和 Y merge</li>
-<li>不满足则等待下一个Run入栈，直到完全没有入栈数据，则用mergeForceCollapse强制merge所有Run（这里仍然有通过长度不同选择顺序的逻辑）</li>
-</ol>
-<p>上述流程如下图所示：<br>
-<img src="https://ws4.sinaimg.cn/large/006tNc79gy1fq9ybsclcwj31cg0jo3zl.jpg" alt="" loading="lazy"><br>
-发生问题的核心原因就是在merge的过程中，罪魁祸首在比较顺序的不统一，并不一直是index小的比较index大的，在 mergeHi &amp; mergeLo 中通过计算count的赢点，即要合并的数组中，你有多少比我最小值还小 or 比我最大值还大的。掐头去尾后，再次比较两个cursor，两个cursor都从大到小开始遍历，然后比较寻找插入的位置，然而在寻找这个插入位置时，compare(B[cursor2],A[cursor1])，因此会与compare(A[cursor1],B[cursor2])的结果不一致。</p>
-<h4 id="bug产生详解">bug产生详解</h4>
-<p>详细举例说明：两个数组A、B 分别是{1，3，3，5，7，10} 和 {3，8，12，15}，首先进行掐头去尾，如下图：<br>
-<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fq6enhy0r6j3120054mxa.jpg" alt="" loading="lazy"><br>
-A中的<strong>1</strong>和B中的<strong>15</strong>都是无需比较的，而这里两边3的比较是按照compare(B[0], A[1])比较的，由于代码的错误导致没有比较出相等，而是比较为小于，因此3被保留。正常情况应该应该一直将A中的两个3也掐掉，对于相等的处理是A中的掐头掐掉，B的去尾去掉。下面我们将这两个错误的3标红表示正常情况下不该保留。</p>
-<blockquote>
-<p>注：掐头去尾过程也是二分法比较寻找到需要的offset</p>
-</blockquote>
-<p>让我们继续，下面开始进行merge排序，两个cursor分别指向A、B的尾部，比较后插入。<br>
-<img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fq6f4d9z64j30wi0act90.jpg" alt="" loading="lazy"><br>
-这个过程中，我们会认为A中最小的元素要大于B中最小的元素（因为掐头的原因），merge的过程中不断的移动cursor1和cursor2直到cursor1到头，然后就可以将B中剩余的元素全部移入A的头部即可完成排序。但是，当比较到两边3的过程时，由于比较顺序的变化，会把B中的3插入到A[2]位置，当cursor1再次移动时，查找B发现B已经空了，这不符合预想“A中最小的元素要大于B中最小的元素”，应该A先空，B后空才正确，因此JDK中主动throw了我们遇到的Exception。<br>
-<img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq6fmu2w7zj31060eswfh.jpg" alt="" loading="lazy"><br>
-由于compare的错误写法，导致A的cursor未遍历到头部就完成了merge，B中的元素全部被插入到A里了，这与开始的<strong>掐头去尾</strong>有明显的冲突，最后应该剩余1个or多个元素，再一起copy到A的头部才是正常的结果。</p>
-<p>一顿凌乱的JDK代码，最后因优化减少比较次数，发生了这个问题，具体代码实在太乱了... JDK的还不好调试... 最后还是要感谢前辈们踩的坑，不然这个问题细节的研究还会多花一些时间...</p>
-<p>最终结论，并不是只要有相等的元素就会crash，而是对分Run片有一定要求，需要比较顺序发生不一致的场景才有可能发生。<br>
-<img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fq5k488ttkj315o040gmh.jpg" alt="" loading="lazy"></p>
-<h4 id="crash数据">Crash数据</h4>
-<p>数组：{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-2,1,0,-2,0,0,0,0};<br>
-排序接口实现：</p>
-<pre><code class="language-Java">if (o1 &gt; o2) {
-    1
-} else {
-    -1
-}
-</code></pre>
-<h2 id="thanks-to">Thanks to</h2>
-<p><a href="http://blog.2baxb.me/archives/993">图解JDK7的Comparison method violates its general contract异常</a><br>
-<a href="https://blog.csdn.net/shadow_zed/article/details/72758912">crash数据</a></p>
 ]]></content>
     </entry>
 </feed>
