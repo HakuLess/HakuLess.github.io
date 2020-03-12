@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://hakuless.github.io/</id>
     <title>HaKuLess</title>
-    <updated>2020-02-19T08:59:06.909Z</updated>
+    <updated>2020-03-12T08:25:50.748Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://hakuless.github.io/"/>
     <link rel="self" href="https://hakuless.github.io/atom.xml"/>
@@ -11,9 +11,90 @@
     <icon>https://hakuless.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, HaKuLess</rights>
     <entry>
+        <title type="html"><![CDATA[1354. Construct Target Array With Multiple Sums —— 题解]]></title>
+        <id>https://hakuless.github.io/post/1354-construct-target-array-with-multiple-sums-ti-jie/</id>
+        <link href="https://hakuless.github.io/post/1354-construct-target-array-with-multiple-sums-ti-jie/">
+        </link>
+        <updated>2020-03-12T07:40:17.000Z</updated>
+        <summary type="html"><![CDATA[<p>本题作为Contest 176的压轴题，难度还是有一些，不过比起普通的算法题，脑筋急转弯的含量略大一点。只要考虑对方向，做出来还是不算太难。本人在Contest时没做出来，结束了才想到方向错了...<br>
+附上题目链接 <a href="https://leetcode.com/problems/construct-target-array-with-multiple-sums/">Construct Target Array With Multiple Sums</a>😁</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>本题作为Contest 176的压轴题，难度还是有一些，不过比起普通的算法题，脑筋急转弯的含量略大一点。只要考虑对方向，做出来还是不算太难。本人在Contest时没做出来，结束了才想到方向错了...<br>
+附上题目链接 <a href="https://leetcode.com/problems/construct-target-array-with-multiple-sums/">Construct Target Array With Multiple Sums</a>😁</p>
+<!-- more -->
+<h2 id="题目描述">题目描述</h2>
+<p>给定一个数组，size不一定，但是值都是1<br>
+然后我们可以选定其中的一个值，把它设置成整个数组的和，如<br>
+[1, 1, 1] -&gt; [1, 1, 3] -&gt; [1, 1, 5] -&gt; [1, 7, 5] ... 无限处理下去<br>
+然后给出一个数组，问能否通过上述内容构建出这个数组</p>
+<h2 id="题目分析">题目分析</h2>
+<p>一个数组构建题目，直白的想法可以直接DFS处理所有可能，然后与原数组判断，但这种方法时间复杂度是O(n^n)，是一个每个结点都有n个儿子的树，即便有一定剪枝操作，这个时间复杂度也是无法接受的。</p>
+<blockquote>
+<p>Contest时一直在考虑这个剪枝优化... 白白浪费时间，应该冷静冷静重新思考</p>
+</blockquote>
+<p>如果正向构建不行，那么我们可以看反向减少能否做到。<br>
+我们知道给定数组肯定有一个最大值，如[9, 3, 5]其中9是最大值，而当前这个数组的最大值是上一次数组的和，因此在这次操作前，可以用最大值 减去 其他所有值得和，即该数组的上一个状态<br>
+[9, 3, 5] -&gt; [1, 3, 5] -&gt; [1, 3, 1] -&gt; [1, 1, 1]<br>
+循环这个过程，直到我们能得到所有值均为1的数组（如果提前得到小于0的值，可以认为不合法而直接return false）</p>
+<h3 id="解法一-反向构建">解法一 反向构建</h3>
+<pre><code class="language-Kotlin">fun isPossible(target: IntArray): Boolean {
+    val pq = PriorityQueue&lt;Long&gt;(compareByDescending { it })
+    var sum = 0L
+    target.forEach {
+        pq.offer(it.toLong())
+        sum += it
+    }
+    while (pq.peek() != 1L) {
+        val item = pq.poll()
+        if (item == 1L) {
+            continue
+        }
+        val last = sum - item
+        if (item - last &lt; 1) {
+            return false
+        }
+        pq.offer(item - last)
+        sum -= last
+    }
+    return true
+}
+</code></pre>
+<p>利用反向的优先级队列，把最大值放在最前面，然后让最大值 减去 剩余的 值，把结果塞回队列，重复这个过程，不断更新最大值，直到最大值为1 or 塞入的值 &lt; 1</p>
+<p>这个算法还有改进的空间，请看解法二</p>
+<h3 id="解法二-反向构建-mod优化">解法二 反向构建 + mod优化</h3>
+<p>上述Code展示了很优雅的解法，不过在一些特殊值得场景下，时间复杂度依然很高。<br>
+如 [1999, 1] 这种数组，每次都会让较大的值减去1，但是要减去1998次才能达到终点，而这可以优化<br>
+最大值更新后 如果仍是最大值，那么其实剩余值并没有变化，每次都减去一个值，直到自己小于它，这不就是取余操作么！优化后的代码如下：</p>
+<pre><code class="language-Kotlin">val pq = PriorityQueue&lt;Long&gt;(compareByDescending { it })
+var sum = 0L
+target.forEach {
+    pq.offer(it.toLong())
+    sum += it
+}
+while (true) {
+    val item = pq.poll() ?: 0L
+    sum -= item
+    // 最大值为1，则其余数字都是1
+    // other sum 为1，则当前值可以直接化为1
+    if (item == 1L || sum == 1L) {
+        return true
+    }
+    // 当前值 小于等于 其他值的和，不合法
+    if (item &lt;= sum || sum == 0L) {
+        return false
+    }
+    pq.add(item % sum)
+    sum += item % sum
+}
+</code></pre>
+<h2 id="思考">思考</h2>
+<p>感到思路不对时，应该停下来，而不是继续越走越远...</p>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[1340. Jump Game V —— 题解]]></title>
-        <id>https://hakuless.github.io/post/1340-jump-game-v-ti-jie</id>
-        <link href="https://hakuless.github.io/post/1340-jump-game-v-ti-jie">
+        <id>https://hakuless.github.io/post/1340-jump-game-v-ti-jie/</id>
+        <link href="https://hakuless.github.io/post/1340-jump-game-v-ti-jie/">
         </link>
         <updated>2020-02-19T08:43:50.000Z</updated>
         <summary type="html"><![CDATA[<p>Contest 174的Q4，如上文所述，由于在Contest中耗费大量精力去搞Q3的 DFS to BFS结果导致两道题都没搞定... （还是太年轻~）<br>
@@ -114,8 +195,8 @@ private fun helper(arr: IntArray, dp: IntArray, cur: Int, d: Int): Int {
     </entry>
     <entry>
         <title type="html"><![CDATA[1339. Maximum Product of Splitted Binary Tree —— 题解]]></title>
-        <id>https://hakuless.github.io/post/1339-maximum-product-of-splitted-binary-tree-ti-jie</id>
-        <link href="https://hakuless.github.io/post/1339-maximum-product-of-splitted-binary-tree-ti-jie">
+        <id>https://hakuless.github.io/post/1339-maximum-product-of-splitted-binary-tree-ti-jie/</id>
+        <link href="https://hakuless.github.io/post/1339-maximum-product-of-splitted-binary-tree-ti-jie/">
         </link>
         <updated>2020-02-10T07:43:50.000Z</updated>
         <summary type="html"><![CDATA[<p>Contest 174的Q3，问题很简洁，把一棵树分成两部分，使两部分的和的乘积最小，求这个最大值（mod 10^9 + 7），不过这题对Kotlin很不友好，下面会详述</p>
@@ -240,8 +321,8 @@ fun maxProduct(root: TreeNode?): Int {
     </entry>
     <entry>
         <title type="html"><![CDATA[1326. Minimum Number of Taps to Open to Water a Garden —— 题解]]></title>
-        <id>https://hakuless.github.io/post/1326-minimum-number-of-taps-to-open-to-water-a-garden-ti-jie</id>
-        <link href="https://hakuless.github.io/post/1326-minimum-number-of-taps-to-open-to-water-a-garden-ti-jie">
+        <id>https://hakuless.github.io/post/1326-minimum-number-of-taps-to-open-to-water-a-garden-ti-jie/</id>
+        <link href="https://hakuless.github.io/post/1326-minimum-number-of-taps-to-open-to-water-a-garden-ti-jie/">
         </link>
         <updated>2020-02-03T06:17:18.000Z</updated>
         <summary type="html"><![CDATA[<p>Contest 172 Q4，作为压轴题题目不算太难，做的时候搞错了点与线段，然后在错误的道路上越走越远...<br>
@@ -379,8 +460,8 @@ fun maxProduct(root: TreeNode?): Int {
     </entry>
     <entry>
         <title type="html"><![CDATA[1114. Print in Order —— 题解]]></title>
-        <id>https://hakuless.github.io/post/1114-print-in-order-ti-jie</id>
-        <link href="https://hakuless.github.io/post/1114-print-in-order-ti-jie">
+        <id>https://hakuless.github.io/post/1114-print-in-order-ti-jie/</id>
+        <link href="https://hakuless.github.io/post/1114-print-in-order-ti-jie/">
         </link>
         <updated>2020-02-03T03:32:34.000Z</updated>
         <summary type="html"><![CDATA[<p>最近工作中终于有些多线程的Case了，玩一玩LeetCode多线程的题目，复习一下知识（N久没有开发过多线程交互的代码了...）<br>
@@ -556,8 +637,8 @@ fun maxProduct(root: TreeNode?): Int {
     </entry>
     <entry>
         <title type="html"><![CDATA[1105. Filling Bookcase Shelves —— 题解]]></title>
-        <id>https://hakuless.github.io/post/1105-filling-bookcase-shelves-ti-jie</id>
-        <link href="https://hakuless.github.io/post/1105-filling-bookcase-shelves-ti-jie">
+        <id>https://hakuless.github.io/post/1105-filling-bookcase-shelves-ti-jie/</id>
+        <link href="https://hakuless.github.io/post/1105-filling-bookcase-shelves-ti-jie/">
         </link>
         <updated>2019-07-03T07:19:48.000Z</updated>
         <summary type="html"><![CDATA[<p>本周状态不错，可惜好几周没有DP的题，一下卡住了...<br>
@@ -605,8 +686,8 @@ dp[k] = minOf[dp[k], dp[k-n] + max[height{k-n..k}]]
     </entry>
     <entry>
         <title type="html"><![CDATA[Union-Find Set]]></title>
-        <id>https://hakuless.github.io/post/union-find-set</id>
-        <link href="https://hakuless.github.io/post/union-find-set">
+        <id>https://hakuless.github.io/post/union-find-set/</id>
+        <link href="https://hakuless.github.io/post/union-find-set/">
         </link>
         <updated>2019-05-25T03:51:03.000Z</updated>
         <summary type="html"><![CDATA[<h2 id="introduction">Introduction</h2>
@@ -774,8 +855,8 @@ class TypedUFS&lt;T&gt;(var n: Int = 0) {
     </entry>
     <entry>
         <title type="html"><![CDATA[Binary Search]]></title>
-        <id>https://hakuless.github.io/post/binary-search</id>
-        <link href="https://hakuless.github.io/post/binary-search">
+        <id>https://hakuless.github.io/post/binary-search/</id>
+        <link href="https://hakuless.github.io/post/binary-search/">
         </link>
         <updated>2019-05-23T08:05:53.000Z</updated>
         <summary type="html"><![CDATA[<h3 id="introduction">Introduction</h3>
@@ -893,8 +974,8 @@ class TypedUFS&lt;T&gt;(var n: Int = 0) {
     </entry>
     <entry>
         <title type="html"><![CDATA[CSS初级学习]]></title>
-        <id>https://hakuless.github.io/post/css-chu-ji-xue-xi</id>
-        <link href="https://hakuless.github.io/post/css-chu-ji-xue-xi">
+        <id>https://hakuless.github.io/post/css-chu-ji-xue-xi/</id>
+        <link href="https://hakuless.github.io/post/css-chu-ji-xue-xi/">
         </link>
         <updated>2019-05-16T02:24:37.000Z</updated>
         <summary type="html"><![CDATA[<p>学习一下CSS，前端要是连设计稿都无法实现，基本需求都满足不了~</p>
@@ -1127,20 +1208,9 @@ selector::pseudo-element {
 ]]></content>
     </entry>
     <entry>
-        <title type="html"><![CDATA[JS语法学习]]></title>
-        <id>https://hakuless.github.io/post/js-yu-fa-xue-xi</id>
-        <link href="https://hakuless.github.io/post/js-yu-fa-xue-xi">
-        </link>
-        <updated>2019-05-09T03:41:59.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="generators">Generators</h2>
-<h2 id="promise">Promise</h2>
-<h2 id="asyncawait">Async/Await</h2>
-]]></content>
-    </entry>
-    <entry>
         <title type="html"><![CDATA[Stack & DFS]]></title>
-        <id>https://hakuless.github.io/post/stack-and-dfs</id>
-        <link href="https://hakuless.github.io/post/stack-and-dfs">
+        <id>https://hakuless.github.io/post/stack-and-dfs/</id>
+        <link href="https://hakuless.github.io/post/stack-and-dfs/">
         </link>
         <updated>2019-02-19T12:00:22.000Z</updated>
         <summary type="html"><![CDATA[<h3 id="stack-dfs">Stack &amp; DFS</h3>
